@@ -37,3 +37,11 @@ Instalacja PWA wymaga publikacji pod HTTPS. Sam lokalny plik `index.html` otwart
 ## Pamięć podręczna
 
 Service worker używa cache `paleta-malarza-v13` i zapisuje pliki aplikacji oraz 53 nowe ilustracje. Po aktualizacji zamknij starą kartę i otwórz ponownie opublikowaną stronę. Jeżeli telefon nadal pokazuje poprzednie grafiki, usuń i ponownie zainstaluj PWA lub wyczyść dane witryny.
+
+
+## Scalona galeria kompozycji — wersja v14
+
+W tej wersji połączono 53 nowe przykłady z 175 wcześniej przygotowanymi, poprawnymi ilustracjami. Zachowano wcześniejsze przykłady klasycznych zasad, pejzaży, linii prowadzących, równowagi, postaci, głębi, przestrzeni pozytywnej/negatywnej i rytmu. Usunięto wyłącznie 48 wadliwych wycinków z serii geom_final, zastępując je nowymi schematami geometrycznymi.
+
+Łącznie galeria zawiera 228 pojedynczych przykładów. Wszystkie obrazy znajdują się luzem obok index.html — bez dodatkowego folderu. Service worker v14 buforuje wszystkie grafiki.
+

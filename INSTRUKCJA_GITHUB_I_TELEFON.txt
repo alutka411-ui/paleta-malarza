@@ -26,3 +26,6 @@ INSTALACJA NA TELEFONIE:
 Android: Chrome → menu ⋮ → Zainstaluj aplikację / Dodaj do ekranu głównego.
 iPhone: Safari → Udostępnij → Dodaj do ekranu początkowego.
 PWA instaluje się z opublikowanego adresu HTTPS, nie z lokalnego pliku index.html.
+
+
+AKTUALIZACJA v14: Galeria zawiera 228 ilustracji (53 nowe + 175 zachowanych). Wszystkie obrazy JPG są luzem obok index.html. Wgraj całą zawartość paczki do głównego katalogu repozytorium; nie twórz folderu kompozycje-mini.
