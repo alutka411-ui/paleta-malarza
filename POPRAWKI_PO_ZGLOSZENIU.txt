@@ -1,38 +1,23 @@
-PALETA MALARZA — POPRAWKI PO ZRZUTACH EKRANU
+PALETA MALARZA — NOWE MATERIAŁY KOMPOZYCYJNE
 
-1. Motyw:
-- przywrócono jasne, ciepłe tło (#f3f1eb);
-- karty są białe / kremowe, tekst ma ciemny kolor;
-- wymuszono czytelny kontrast nagłówków i list w Warsztacie Koloru oraz Bibliotece wiedzy;
-- ustawiono jasny theme-color i background_color w PWA.
+Zastąpiono poprzedni zestaw miniatur nowymi, przesłanymi planszami.
 
-2. Galeria kompozycji:
-- ponownie wycięto 48 szkiców z planszy 8 × 6;
-- każdy kadr zawiera teraz pełną ramkę i cały szkic, z marginesem;
-- poprawiono 25 miniatur pejzażowych, usunięto nachodzący tytuł planszy z pierwszego rzędu i rozdzielono wszystkie pięć rzędów;
-- galeria zawiera 242 pojedyncze przykłady.
+Źródła:
+1. „Bez nazwy.png” — 16 kadrów z geometrycznymi schematami kompozycji.
+2. „Kompozycje pejzaży w siatce szkiców(1).png” — 25 oddzielnych pejzaży.
+3. „Przykłady kompozycji krajobrazowych(1).png” — 12 przykładów zasad kompozycji i ich zastosowań.
 
-3. PWA i publikacja:
-- przebudowano listę APP_FILES w service workerze na podstawie rzeczywiście istniejących plików;
-- usunięto odwołania do nieistniejących grafik;
-- cache podniesiono do paleta-malarza-v9;
-- manifest i instrukcja GitHub Pages zostały zaktualizowane.
+Razem: 53 obrazy.
+Każdy obraz jest osobnym plikiem JPG w głównym katalogu publikacji. Nie ma folderu dla nowych ilustracji. Każdy rekord galerii ma tytuł, kategorię i autorski opis.
 
-Kontrole:
-- wszystkie 6 skryptów przechodzą `node --check`;
-- nie ma powtórzonych identyfikatorów HTML;
-- wszystkie 242 ścieżki grafik w galerii istnieją;
-- wszystkie 251 zasobów wskazanych do cache istnieją;
-- manifest ma jasne kolory;
-- nie wykonano pełnego testu interfejsu w przeglądarce z powodu blokady uruchamiania strony testowej w tym środowisku; miniatury zweryfikowano wizualnie na arkuszach kontrolnych.
+Weryfikacja:
+- poprawiono współrzędne ramek planszy pejzażowej po sprawdzeniu linii obramowań;
+- wizualnie sprawdzono przykłady z pierwszego, środkowego i ostatniego rzędu;
+- wszystkie pliki JPG są obecne;
+- index.html odwołuje się do 53 plików JPG w katalogu głównym;
+- service worker pre-cache zawiera 62 zasoby aplikacji (9 plików aplikacji/ikon/manifest + 53 ilustracje);
+- cache PWA: paleta-malarza-v13;
+- wszystkie 6 bloków JavaScript przechodzi kontrolę składni;
+- brak zduplikowanych identyfikatorów HTML.
 
-
-AKTUALIZACJA GALERII PO PONOWNYM PRZESŁANIU ORYGINAŁÓW:
-- stare, błędnie przycięte grafiki usunięto;
-- plansze ponownie wycięto z pełnowymiarowych oryginałów;
-- 48 małych szkiców geometrycznych wycięto z wykrytych ramek 8 × 6, a nie z szacunkowych przedziałów;
-- 16 ramek z planszy „line for itself” ponownie wycięto po wykryciu rzeczywistych prostokątnych obrysów;
-- przywrócono kompletne przykłady z plansz: geometrycznych, pejzażowych, figuratywnych, przestrzeni pozytywnej/negatywnej, głębi, rytmu i linii prowadzących;
-- galeria ma 223 kompletne miniatury; każda karta ma osobny tytuł i krótki opis;
-- filtr kategorii dopasowano do rzeczywistych nazw kategorii;
-- cache PWA: v10; lista cache zawiera dokładnie wszystkie 223 pliki galerii.
+Ważne: z poprzednich 223 miniatur nie korzysta już galeria. W repozytorium mogą pozostać jako nieużywane pliki; nie są potrzebne do działania nowej galerii.

@@ -1,25 +1,28 @@
-PALETA MALARZA — PUBLIKACJA NA GITHUB PAGES I INSTALACJA NA TELEFONIE
+PALETA MALARZA — AKTUALIZACJA GALERII KOMPOZYCJI
 
-1. Rozpakuj archiwum ZIP na komputerze.
-2. Otwórz folder z rozpakowaną zawartością.
-3. Zaznacz CAŁĄ zawartość folderu (nie sam folder nadrzędny).
-4. W repozytorium GitHub alutka411-ui/paleta-malarska otwórz główny katalog na gałęzi main.
-5. Wybierz Add file → Upload files i przeciągnij wszystkie pliki oraz foldery.
-6. Upewnij się, że na najwyższym poziomie repozytorium znajdują się m.in. index.html, manifest.webmanifest, sw.js, ikony, .nojekyll oraz folder kompozycje-mini.
-7. Zatwierdź zmiany przyciskiem Commit changes.
-8. Sprawdź Settings → Pages: Deploy from a branch, gałąź main, katalog /(root).
-9. Po zakończeniu publikacji otwórz adres GitHub Pages.
+W paczce są:
+- index.html — zaktualizowana aplikacja;
+- sw.js — nowa pamięć podręczna PWA v13;
+- 53 osobne ilustracje JPG;
+- manifest PWA, ikony i .nojekyll.
+
+JAK WGRAC NA GITHUB:
+1. Rozpakuj ZIP.
+2. Otwórz repozytorium alutka411-ui/paleta-malarska.
+3. W głównym katalogu (root) wybierz Add file → Upload files.
+4. Przeciągnij całą zawartość rozpakowanego folderu.
+5. JPG muszą leżeć luzem obok index.html — nie wkładaj ich do folderu.
+6. Zastąp dotychczasowe index.html oraz sw.js.
+7. Zatwierdź przyciskiem Commit changes.
 
 WAŻNE:
-- Folder kompozycje-mini musi zostać wgrany w całości; zawiera 223 pojedyncze ilustracje.
-- Nie przenoś plików do dodatkowego podfolderu — index.html ma być w katalogu głównym publikacji.
-- Nie usuwaj manifest.webmanifest ani sw.js.
-- Po aktualizacji zamknij poprzednią kartę aplikacji i otwórz ponownie adres GitHub Pages.
-- Jeśli telefon pokazuje starą wersję, wyczyść dane witryny dla strony GitHub Pages lub usuń i zainstaluj PWA ponownie.
+- Nie twórz folderu kompozycje-mini.
+- Nie przenoś nowych plików JPG do podfolderu.
+- Nie usuwaj manifest.webmanifest, ikon ani .nojekyll.
+- Stare, nieużywane grafiki mogą zostać w repozytorium; nowa galeria korzysta wyłącznie z 53 nowych plików.
+- GitHub Pages powinien publikować gałąź main, katalog /(root).
 
-INSTALACJA:
+INSTALACJA NA TELEFONIE:
 Android: Chrome → menu ⋮ → Zainstaluj aplikację / Dodaj do ekranu głównego.
-iPhone/iPad: Safari → Udostępnij → Dodaj do ekranu początkowego.
-Instalacja wymaga opublikowanej strony HTTPS. Lokalny plik index.html otwarty z dysku nie zapewnia pełnej obsługi PWA.
-
-To PWA — nie jest to plik APK.
+iPhone: Safari → Udostępnij → Dodaj do ekranu początkowego.
+PWA instaluje się z opublikowanego adresu HTTPS, nie z lokalnego pliku index.html.
