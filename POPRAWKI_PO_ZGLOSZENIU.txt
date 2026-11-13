@@ -1,0 +1,38 @@
+PALETA MALARZA — POPRAWKI PO ZRZUTACH EKRANU
+
+1. Motyw:
+- przywrócono jasne, ciepłe tło (#f3f1eb);
+- karty są białe / kremowe, tekst ma ciemny kolor;
+- wymuszono czytelny kontrast nagłówków i list w Warsztacie Koloru oraz Bibliotece wiedzy;
+- ustawiono jasny theme-color i background_color w PWA.
+
+2. Galeria kompozycji:
+- ponownie wycięto 48 szkiców z planszy 8 × 6;
+- każdy kadr zawiera teraz pełną ramkę i cały szkic, z marginesem;
+- poprawiono 25 miniatur pejzażowych, usunięto nachodzący tytuł planszy z pierwszego rzędu i rozdzielono wszystkie pięć rzędów;
+- galeria zawiera 242 pojedyncze przykłady.
+
+3. PWA i publikacja:
+- przebudowano listę APP_FILES w service workerze na podstawie rzeczywiście istniejących plików;
+- usunięto odwołania do nieistniejących grafik;
+- cache podniesiono do paleta-malarza-v9;
+- manifest i instrukcja GitHub Pages zostały zaktualizowane.
+
+Kontrole:
+- wszystkie 6 skryptów przechodzą `node --check`;
+- nie ma powtórzonych identyfikatorów HTML;
+- wszystkie 242 ścieżki grafik w galerii istnieją;
+- wszystkie 251 zasobów wskazanych do cache istnieją;
+- manifest ma jasne kolory;
+- nie wykonano pełnego testu interfejsu w przeglądarce z powodu blokady uruchamiania strony testowej w tym środowisku; miniatury zweryfikowano wizualnie na arkuszach kontrolnych.
+
+
+AKTUALIZACJA GALERII PO PONOWNYM PRZESŁANIU ORYGINAŁÓW:
+- stare, błędnie przycięte grafiki usunięto;
+- plansze ponownie wycięto z pełnowymiarowych oryginałów;
+- 48 małych szkiców geometrycznych wycięto z wykrytych ramek 8 × 6, a nie z szacunkowych przedziałów;
+- 16 ramek z planszy „line for itself” ponownie wycięto po wykryciu rzeczywistych prostokątnych obrysów;
+- przywrócono kompletne przykłady z plansz: geometrycznych, pejzażowych, figuratywnych, przestrzeni pozytywnej/negatywnej, głębi, rytmu i linii prowadzących;
+- galeria ma 223 kompletne miniatury; każda karta ma osobny tytuł i krótki opis;
+- filtr kategorii dopasowano do rzeczywistych nazw kategorii;
+- cache PWA: v10; lista cache zawiera dokładnie wszystkie 223 pliki galerii.

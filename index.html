@@ -1,0 +1,1105 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Paleta Malarza — pracownia koloru</title>
+<meta name="theme-color" content="#f3f1eb">
+<meta name="description" content="Paleta Malarza — analiza kolorów i planowanie palet do malowania.">
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="./favicon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
+<link rel="manifest" href="./manifest.webmanifest">
+
+<style>
+:root{--ink:#28251f;--muted:#777168;--paper:#f7f4ee;--card:#fffdfa;--line:#e8e1d7;--accent:#286c68;--soft:#e8f0eb}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
+header{padding:30px max(22px,calc((100vw - 1180px)/2)) 20px;background:#eee8dd;border-bottom:1px solid var(--line)}
+.kicker{font-size:11px;letter-spacing:.17em;text-transform:uppercase;color:var(--accent);font-weight:700}
+h1{font:500 clamp(28px,4vw,42px)/1.12 Georgia,serif;margin:7px 0}header p{margin:8px 0 0;color:#625c53;max-width:720px}
+main{max-width:1180px;margin:24px auto;padding:0 20px 60px}
+nav{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:22px}
+nav button,.btn{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:10px 15px;border-radius:999px;cursor:pointer;font:inherit}
+nav button.active,.btn.primary{background:var(--accent);border-color:var(--accent);color:white}
+.panel{display:none}.panel.active{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;margin-bottom:16px;box-shadow:0 5px 20px #342a1608}
+h2{font:500 25px Georgia,serif;margin:0 0 8px}h3{font-size:17px;margin:0 0 10px}p.note,.muted{color:var(--muted);font-size:13px}
+.upload{display:block;position:relative;width:100%;min-width:0;max-width:100%;min-height:112px;border:1.5px dashed #c8bdae;border-radius:15px;padding:24px;text-align:center;background:#fcfaf6;cursor:pointer;overflow:hidden;clear:both}
+.upload input{display:none}.upload strong,.upload span{display:block;max-width:100%;white-space:normal;overflow-wrap:anywhere}.upload strong{font-size:17px}.controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:14px 0}
+input[type=range]{accent-color:var(--accent)}select{padding:9px;border:1px solid var(--line);border-radius:9px;background:white}
+.preview{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(250px,.7fr);gap:18px;align-items:start}
+.preview img{width:100%;max-height:440px;object-fit:contain;background:#eee;border-radius:12px}
+.palette{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px}
+.swatch{min-width:0}.chip{height:76px;border-radius:12px;border:1px solid #0000000c;cursor:pointer;position:relative}
+.swatch small{display:block;color:var(--muted);font-size:12px;overflow-wrap:anywhere}.swatch b{font-size:13px;font-weight:600}
+.tag{display:inline-block;background:var(--soft);color:#2e6558;border-radius:30px;padding:3px 9px;font-size:11px;margin-top:5px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:13px}
+.pal-card{background:var(--card);border:1px solid var(--line);padding:14px;border-radius:15px;cursor:pointer;text-align:left;color:inherit}
+.pal-card:hover{border-color:#8ca9a0;transform:translateY(-1px)}
+.strip{display:flex;height:66px;border-radius:10px;overflow:hidden;margin:9px 0}
+.strip span{flex:1;min-width:0}.pal-card h3{margin:0;font-size:16px}.pal-card p{margin:0;color:var(--muted);font-size:12px}
+.filterrow{display:flex;gap:9px;flex-wrap:wrap;margin:12px 0}
+input[type=search],input[type=color]{border:1px solid var(--line);border-radius:10px;padding:10px;background:white}
+.wheel-layout{display:grid;grid-template-columns:minmax(280px,1fr) minmax(260px,.8fr);gap:24px;align-items:center}
+#wheel{width:100%;max-width:470px;display:block;margin:auto;cursor:crosshair}
+.scheme-list{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0}.scheme-list button{padding:8px 11px;border:1px solid var(--line);border-radius:9px;background:white;cursor:pointer}.scheme-list button.active{background:var(--accent);color:white}
+.hexrow{display:flex;gap:7px;flex-wrap:wrap}.hexrow button{border:0;background:transparent;padding:0;cursor:pointer}
+.hexrow .chip{width:66px;height:55px}.hexrow small{display:block;color:var(--muted);font-size:11px}
+.tip{background:#f1eee7;border-radius:12px;padding:13px;margin-top:12px;font-size:13px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}.hidden{display:none!important}
+@media(max-width:760px){main{padding:0 12px 38px;margin:14px auto}header{padding:22px 16px 18px}.card{padding:15px;border-radius:14px}.preview,.wheel-layout{grid-template-columns:minmax(0,1fr);gap:14px}.preview>*{min-width:0}.preview img{max-height:330px}.palette{grid-template-columns:repeat(2,minmax(0,1fr))}.chip{height:65px}.grid{grid-template-columns:minmax(0,1fr)}nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}nav button{padding:9px 7px;font-size:13px}.upload{padding:20px 12px;min-height:105px}.controls>*{max-width:100%}.filterrow>*{min-width:0;flex:1}#wheel{max-width:360px}}
+@media(max-width:380px){h2{font-size:22px}.swatch b{font-size:12px}.swatch small{font-size:11px}}
+
+#projectCanvas{display:block;max-height:520px;object-fit:contain}#subjectFile{display:none}
+@media(max-width:760px){#project .controls{align-items:stretch;flex-direction:column}#project .controls label,#project .controls select,#project .controls button{width:100%}#projectCanvas{max-height:380px}.preview{grid-template-columns:minmax(0,1fr)}}
+
+/* Rozszerzone moduły pracowni */
+.nav-extra{background:#f1eee7!important;border-color:#d8cfc2!important}
+.section-intro{max-width:850px;color:var(--muted);margin:0 0 16px}
+.workshop-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:13px}
+.lesson-card{background:#fffdfa;border:1px solid var(--line);border-radius:15px;padding:17px}
+.lesson-card h3{margin-bottom:8px}
+.lesson-card p{margin:7px 0;color:#514c44}
+.lesson-card ul{padding-left:19px;margin:8px 0}
+.lesson-card li{margin:5px 0}
+.knowledge-layout{display:grid;grid-template-columns:250px minmax(0,1fr);gap:16px;align-items:start}
+.knowledge-nav{position:sticky;top:12px}
+.knowledge-nav button{display:block;width:100%;text-align:left;margin:0 0 6px;border:1px solid var(--line);background:#fffdfa;border-radius:9px;padding:9px;cursor:pointer}
+.knowledge-nav button.active{background:var(--accent);color:#fff}
+.knowledge-entry{background:#fffdfa;border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:12px}
+.knowledge-entry h3{font-family:Georgia,serif;font-size:20px}
+.source-label{display:inline-block;border:1px solid #d8cfc2;border-radius:30px;padding:3px 8px;font-size:11px;color:#625c53;margin:0 5px 6px 0}
+.comp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:15px}
+.comp-card{border:1px solid var(--line);background:#fffdfa;border-radius:16px;overflow:hidden}
+.comp-card img{width:100%;height:220px;object-fit:contain;background:#eee9e1;display:block}
+.comp-card .comp-copy{padding:16px}
+.comp-card h3{font-family:Georgia,serif;font-size:20px}
+.comp-card p{margin:7px 0;color:#514c44}
+.comp-meta{font-size:12px;color:var(--muted)}
+.comp-schematic{width:100%;height:220px;display:flex;align-items:center;justify-content:center;background:#eee9e1}
+.comp-schematic svg{width:100%;height:100%;max-width:420px}
+.master-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:13px}
+.master-card{background:#fffdfa;border:1px solid var(--line);border-radius:15px;padding:15px}
+.master-card .strip{height:54px}
+.search-wide{width:100%;max-width:540px}
+.callout{background:#f1eee7;border-radius:12px;padding:14px;margin:12px 0;color:#4d4942}
+.small-muted{font-size:12px;color:var(--muted)}
+@media(max-width:760px){.knowledge-layout{grid-template-columns:1fr}.knowledge-nav{position:static;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}.knowledge-nav button{margin:0}.comp-card img{height:200px}}
+
+
+.composition-sketch{background:#f0ede6;border-bottom:1px solid var(--line);padding:12px}
+.composition-sketch svg{width:100%;height:auto;display:block;max-height:190px}
+.sketch-frame{fill:#fbfaf6;stroke:#bdb6aa;stroke-width:2}
+.sketch-mass{fill:#b7b0a4;stroke:#625e56;stroke-width:1.5}
+.sketch-dark{fill:#6f6a62;stroke:#45413b;stroke-width:1.5}
+.sketch-light{fill:#ded8cc;stroke:#8d867a;stroke-width:1.5}
+.sketch-line{fill:none;stroke:#6b665d;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.sketch-guide{fill:none;stroke:#b4a999;stroke-width:1.3;stroke-dasharray:4 4}
+.sketch-focus{fill:#b65d4a;stroke:#773a30;stroke-width:1.5}
+.comp-card .comp-copy{padding:14px}
+
+
+/* Interaktywne narzędzia Warsztatu Koloru */
+.wheel-tool-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(285px,1fr));gap:14px}
+.wheel-tool{min-width:0}
+.interactive-wheel-wrap{max-width:390px;margin:10px auto 14px}
+.interactive-wheel-wrap svg{display:block;width:100%;height:auto;touch-action:manipulation;cursor:crosshair}
+.wheel-segment{stroke:#fffdfa;stroke-width:1;cursor:pointer}
+.wheel-marker{fill:none;stroke:#211f1c;stroke-width:3}
+.pigment-wheel-label{font:11px system-ui,sans-serif;fill:#29251f;text-anchor:middle;pointer-events:none}
+.pigment-legend{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;margin:8px 0 12px}.pigment-legend button{display:flex;align-items:center;gap:7px;min-width:0;border:1px solid var(--line);border-radius:8px;background:#fffdfa;padding:5px;text-align:left;cursor:pointer;font-size:11px}.pigment-legend button:hover{border-color:var(--accent)}.pigment-legend span{width:19px;height:19px;border-radius:5px;flex:none;border:1px solid #0002}.pigment-mix-preview{display:grid;grid-template-columns:1fr 1.25fr 1fr;gap:8px;align-items:center;text-align:center;margin:12px 0}
+.pigment-mix-preview>div{min-width:0}.pigment-mix-preview span{display:block;height:58px;border-radius:10px;border:1px solid #0002;margin-bottom:6px}
+.pigment-mix-preview small{display:block;font-size:11px;overflow-wrap:anywhere;color:var(--muted)}
+.pigment-mix-preview b{display:block;font-size:13px}
+.skin-gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.skin-card{border:1px solid var(--line);border-radius:14px;padding:13px;background:#fffdfa}
+.skin-card h3{font-size:15px;margin-bottom:5px}
+.skin-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin:10px 0}
+.skin-strip span{height:52px;border-radius:7px;border:1px solid #0001}
+.skin-card p{font-size:12px;color:var(--muted);margin:5px 0}
+.skin-legend{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;font-size:10px;color:var(--muted);text-align:center}
+.exercise-topline{display:flex;justify-content:space-between;gap:10px;color:var(--muted);font-size:13px;margin:8px 0}
+.exercise-question{font:22px/1.35 Georgia,serif;margin:18px 0}
+.exercise-answers{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:9px}
+.exercise-answer{padding:12px;border:1px solid var(--line);border-radius:11px;background:#fffdfa;text-align:left;cursor:pointer;font:inherit}
+.exercise-answer:hover{border-color:var(--accent)}
+.exercise-answer.correct{border-color:#3d806b;background:#e9f2ed}
+.exercise-answer.incorrect{border-color:#b65d4a;background:#f7ebe7}
+.exercise-answer:disabled{cursor:default;opacity:1}
+.renesans-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:8px}
+.renesans-card{display:flex;gap:9px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:8px;background:#fffdfa;text-align:left;cursor:pointer;min-width:0}
+.renesans-card:hover{border-color:var(--accent)}
+.renesans-chip{width:34px;height:34px;flex:none;border-radius:8px;border:1px solid #0002}
+.renesans-card b{display:block;font-size:12px;line-height:1.3}
+.renesans-card small{display:block;color:var(--muted);font-size:10px;overflow-wrap:anywhere}
+@media(max-width:760px){.wheel-tool-grid{grid-template-columns:1fr}.interactive-wheel-wrap{max-width:330px}.exercise-question{font-size:19px}}
+
+
+/* Porządek w Warsztacie Koloru: podzakładki */
+.workshop-subnav{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 18px;padding:8px;background:#eee9e0;border:1px solid var(--line);border-radius:14px}
+.workshop-subnav button{border:1px solid transparent;background:transparent;color:var(--ink);border-radius:10px;padding:10px 14px;cursor:pointer;font:600 13px/1.2 system-ui,sans-serif}
+.workshop-subnav button.active{background:var(--accent);color:white;box-shadow:0 2px 8px #00000012}
+.workshop-pane{display:none}
+.workshop-pane.active{display:block;animation:workshopFade .16s ease-out}
+@keyframes workshopFade{from{opacity:.72;transform:translateY(3px)}to{opacity:1;transform:none}}
+.workshop-pane .card{margin-bottom:16px}
+.workshop-pane .wheel-tool-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.workshop-pane .wheel-tool{min-width:0}
+.workshop-pane .pigment-card .lesson-card{border:0;padding:0}
+.reference-composition-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:13px}
+.reference-composition-card{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fffdfa;display:flex;flex-direction:column;min-width:0}
+.reference-composition-card img{width:100%;height:175px;object-fit:contain;background:#f0ede7;display:block;padding:6px}
+.reference-composition-card .reference-copy{padding:12px;display:flex;flex-direction:column;gap:6px;flex:1}
+.reference-composition-card h3{font:600 15px/1.25 system-ui,sans-serif;margin:0}
+.reference-composition-card p{font-size:12px;color:#514c44;margin:0;line-height:1.45}
+.reference-composition-card .reference-tag{margin-top:auto;padding-top:7px;font-size:10px;letter-spacing:.03em;color:var(--muted);text-transform:uppercase}
+.reference-count{color:var(--muted);font-size:12px;margin:0 0 10px}
+@media(max-width:760px){
+ .workshop-subnav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+ .workshop-subnav button{padding:10px 7px;font-size:12px}
+ .workshop-pane .wheel-tool-grid{grid-template-columns:1fr}
+ .reference-composition-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+ .reference-composition-card img{height:145px}
+ .reference-composition-card .reference-copy{padding:9px}
+ .reference-composition-card h3{font-size:13px}
+ .reference-composition-card p{font-size:11px}
+}
+@media(max-width:380px){.reference-composition-grid{grid-template-columns:1fr}}
+
+
+/* Jasna pracownia — ciepłe tło, białe karty i wysoki kontrast */
+:root{
+ --ink:#28251f;--muted:#625e55;--paper:#f3f1eb;--card:#fffdfa;
+ --line:#ded9cf;--accent:#286c68;--soft:#e8f0eb;
+ color-scheme:light;
+}
+html,body{background:var(--paper)!important;color:var(--ink)!important}
+body{background:linear-gradient(180deg,#f6f4ee 0%,#efede6 100%)!important}
+header{background:#e9e4da!important;border-bottom:1px solid #d9d2c6!important}
+header p{color:#514d45!important}
+.kicker{color:#286c68!important}
+nav button,.btn{background:#fffdfa!important;color:#28251f!important;border-color:#d9d3c8!important}
+nav button.active,.btn.primary{background:#286c68!important;border-color:#286c68!important;color:#fff!important}
+.card,.pal-card,.reference-composition-card,.stat{
+ background:#fffdfa!important;border-color:#ded9cf!important;color:#28251f!important;
+ box-shadow:0 5px 18px rgba(50,43,31,.055)!important
+}
+p.note,.muted,.reference-count{color:#625e55!important}
+input[type=search],input[type=text],input[type=file],select,textarea{
+ background:#fff!important;color:#28251f!important;border-color:#d4cec3!important
+}
+input::placeholder{color:#817b70!important;opacity:1}
+.upload{background:#fbfaf6!important;border-color:#bdb5a8!important;color:#28251f!important}
+.tip{background:#f0ede6!important;color:#302d28!important;border:1px solid #ded8cc!important}
+.tag{background:#e8f0eb!important;color:#275b50!important}
+.scheme-list button{background:#fff!important;color:#302d28!important;border-color:#d9d3c8!important}
+.scheme-list button.active{background:#286c68!important;color:#fff!important}
+.swatch .chip{border-color:#00000020!important}
+.reference-composition-card img{
+ background:#f0ede7!important;padding:10px!important;object-fit:contain!important;
+ height:205px!important
+}
+.reference-composition-card .reference-copy{background:#fffdfa!important}
+.reference-composition-card h3{color:#28251f!important}
+.reference-composition-card p{color:#514d45!important}
+.reference-composition-card .reference-tag{color:#286c68!important}
+.preview img{background:#eeeae2!important}
+#installHelp{background:#fffdfa!important;border:1px solid #ded9cf!important;border-radius:14px;padding:14px;margin:0 0 16px;color:#28251f!important}
+#installHelp summary{cursor:pointer;font-weight:650;color:#286c68!important}
+#installHelp p{font-size:13px;color:#514d45!important;margin:8px 0 0}
+/* Mocny, przewidywalny kontrast w kartach lekcji i Bibliotece wiedzy */
+.lesson-card{background:#fffdfa!important;color:#28251f!important;border-color:#ded9cf!important}
+.lesson-card h3,.lesson-card strong{color:#252820!important}
+.lesson-card p,.lesson-card li,.lesson-card ul{color:#45443e!important}
+.knowledge-nav button{background:#fffdfa!important;color:#28251f!important;border-color:#ded9cf!important}
+.knowledge-nav button.active{background:#286c68!important;color:#fff!important}
+.knowledge-entry{background:#fffdfa!important;color:#28251f!important;border-color:#ded9cf!important}
+.knowledge-entry h3,.knowledge-entry p,.knowledge-entry li{color:#34332e!important}
+.section-intro{color:#625e55!important}
+.workshop-subnav{background:#ebe7de!important;border-color:#ddd6ca!important}
+.workshop-subnav button{color:#302d28!important}
+.workshop-subnav button.active{background:#286c68!important;color:#fff!important}
+.reference-composition-card img{object-fit:contain!important;object-position:center!important}
+@media(max-width:760px){
+ .reference-composition-card img{height:180px!important}
+}
+
+</style></head>
+<body>
+<header><div class="kicker">Pracownia koloru · narzędzie dla malarzy</div><h1>Paleta Malarza</h1><p>Odkrywaj kolory na podstawie własnych zdjęć, szukaj nieoczywistych akcentów i buduj świadome zestawienia malarskie.</p></header>
+<details id="installHelp">
+ <summary>Jak dodać Paletę Malarza do telefonu?</summary>
+ <p><b>Android:</b> otwórz aplikację w Chrome, wybierz menu ⋮ i „Zainstaluj aplikację” lub „Dodaj do ekranu głównego”.</p>
+ <p><b>iPhone:</b> otwórz stronę w Safari, wybierz Udostępnij, a następnie „Dodaj do ekranu początkowego”.</p>
+ <p>Najpierw opublikuj aplikację przez GitHub Pages i otwórz jej adres HTTPS. Po instalacji będzie dostępna jak zwykła aplikacja.</p>
+</details>
+<main>
+<nav>
+<button class="active" data-tab="photo">Analiza zdjęcia</button><button data-tab="library">Palety inspiracyjne</button><button data-tab="guide">Mała ściąga malarska</button><button data-tab="workshop">Warsztat Koloru</button><button data-tab="knowledge">Biblioteka wiedzy</button><button data-tab="compositions">Kompozycja obrazu</button><button data-tab="masterpieces">Palety dzieł</button>
+</nav>
+<section id="photo" class="panel active">
+<div class="card"><h2>Kolory z Twojego zdjęcia</h2><p class="note">Analiza próbuje rozdzielić rzeczywiste grupy barw, zamiast uśredniać całe zdjęcie. Próbki są pobierane z wielu punktów, a podobne odcienie grupowane w przestrzeni CIELAB. Kliknij fragment zdjęcia, aby sprawdzić konkretny kolor.</p>
+<div class="upload" id="drop" role="button" tabindex="0"><strong>Wgraj zdjęcie obrazu lub fotografię</strong><span class="muted">Kliknij albo przeciągnij plik JPG, PNG lub WebP</span><input id="file" type="file" accept="image/*"></div>
+<div id="photoArea" class="hidden">
+<div class="preview" style="margin-top:18px"><div><img id="preview" alt="Wgrane zdjęcie"><p class="note">Kliknij zdjęcie, aby pobrać kolor z wybranego miejsca.</p></div><div><h3>Kolor wskazany na zdjęciu</h3><div id="picked"></div><div class="controls"><label>Liczba kolorów <select id="count"><option>5</option><option selected>7</option><option>9</option><option>12</option></select></label><button class="btn primary" id="analyze">Analizuj ponownie</button></div><p class="note">Wynik zależy od światła, jakości fotografii i ustawień ekranu. To analiza barw cyfrowych, nie dokładny przepis na pigmenty.</p></div></div>
+<div class="card" style="margin-top:16px"><h3>Najważniejsze kolory ze zdjęcia</h3><div id="extracted" class="palette"></div><div id="paintRecipes" style="margin-top:18px"></div></div>
+<div class="card"><h3>Kolory, które mogą z nimi zagrać</h3><div id="generated"></div></div>
+<div class="card" id="paintingPlanCard"><h3>Plan kolorystyczny do obrazu</h3>
+<p class="note">Na podstawie zdjęcia przygotuję propozycję gruntu, warstw, przecierek i akcentów. To plan malarski, nie automatyczny projekt kompozycji.</p>
+<div class="scheme-list" id="paintingStyles" style="margin:14px 0">
+<button class="active" data-painting-style="layered">Warstwowy z przecierkami</button>
+<button data-painting-style="light">Jasny i subtelny</button>
+<button data-painting-style="bold">Ekspresyjny</button>
+<button data-painting-style="warm">Ciepły</button>
+<button data-painting-style="complementary">Dopełniający</button>
+<button data-painting-style="neon">Neonowy</button>
+</div>
+<div id="paintingPlan"><span class="muted">Wgraj zdjęcie, aby otrzymać plan kolorystyczny.</span></div>
+</div>
+</div></div>
+</section>
+
+<section id="library" class="panel">
+<div class="card"><h2>Biblioteka palet inspiracyjnych</h2><p class="note">Ponad 40 autorskich zestawień: od subtelnych pejzaży po odważne, nieoczywiste kontrasty. Wybierz paletę, aby zobaczyć nazwy i kody kolorów.</p>
+<div class="filterrow"><input id="search" type="search" placeholder="Szukaj: morze, portret, zieleń…"><select id="category"><option value="all">Wszystkie nastroje</option><option>Spokojne</option><option>Romantyczne</option><option>Kontrastowe</option><option>Pejzaż</option><option>Portret</option><option>Vintage</option><option>Ekspresyjne</option><option>Monochromatyczne</option></select></div>
+<div id="palettes" class="grid"></div></div>
+<div id="detail" class="card hidden"><h2 id="detailTitle"></h2><p id="detailDesc" class="muted"></p><div id="detailColors" class="palette"></div><div class="actions" style="margin-top:14px"><button class="btn" id="copyPalette">Kopiuj kody HEX</button></div></div>
+</section>
+
+<section id="guide" class="panel">
+<div class="card"><h2>Mała ściąga malarska</h2><div class="grid">
+<div class="tip"><b>Kolory dopełniające</b><br>Leżą naprzeciw siebie. Zestawione obok siebie wzmacniają wrażenie kontrastu; mieszane mogą dawać stonowane szarości i brązy.</div>
+<div class="tip"><b>Kolory analogiczne</b><br>Sąsiadują na kole. Dają spokojne, spójne zestawienia — świetne do pejzaży, nieba i wody.</div>
+<div class="tip"><b>Kontrast temperatury</b><br>Ciepłe światło na chłodnym cieniu albo chłodne światło na ciepłym podłożu pomaga budować przestrzeń.</div>
+<div class="tip"><b>Nieoczywisty akcent</b><br>Wybierz mały fragment w kolorze z przeciwnej strony koła. Nie musi być czysty ani jaskrawy — przygaszony akcent często wygląda szlachetniej.</div>
+<div class="tip"><b>Barwa, walor, nasycenie</b><br>Przed doborem odcienia sprawdź, czy kolory różnią się jasnością. Zestaw o podobnym walorze może zlać się nawet wtedy, gdy odcienie są różne.</div>
+<div class="tip"><b>Cienie</b><br>Nie przyciemniaj wszystkiego czernią. Spróbuj chłodniejszego odpowiednika barwy lokalnej lub odrobiny koloru dopełniającego.</div>
+</div></div>
+
+</section>
+<section id="workshop" class="panel">
+
+ <div class="workshop-subnav" role="tablist" aria-label="Działy Warsztatu Koloru">
+  <button type="button" class="active" data-workshop-tab="basics" role="tab" aria-selected="true">Podstawy koloru</button>
+  <button type="button" data-workshop-tab="wheels" role="tab" aria-selected="false">Klasyczne koło</button>
+  <button type="button" data-workshop-tab="harmony" role="tab" aria-selected="false">Chroma i harmonia</button>
+  <button type="button" data-workshop-tab="pigments" role="tab" aria-selected="false">Pigmenty i farby</button>
+  <button type="button" data-workshop-tab="skin" role="tab" aria-selected="false">Karnacja</button>
+  <button type="button" data-workshop-tab="practice" role="tab" aria-selected="false">Ćwiczenia</button>
+ </div>
+ <div class="workshop-pane active" data-workshop-pane="basics" role="tabpanel">
+<div class="card">
+  <h2>Warsztat Koloru</h2>
+  <p class="section-intro">Praktyczny warsztat do świadomego budowania palety. Rozdzielaj barwę, walor i chromę; kontroluj temperaturę, relacje i proporcje. Poniższe lekcje łączą materiały źródłowe z uporządkowanymi wskazówkami warsztatowymi.</p>
+  <div class="callout"><b>Zasada pracowni:</b> najpierw ustal relację walorów i dominantę, potem dobieraj dokładny odcień. Kolor nie działa w izolacji — jego wygląd zmienia się zależnie od sąsiedztwa, światła, podłoża i grubości warstwy.</div>
+  <div class="workshop-grid">
+   <article class="lesson-card"><h3>1. Trzy wymiary koloru</h3><p><b>Barwa (hue)</b> określa rodzinę koloru; <b>walor</b> — jasność lub ciemność; <b>chroma</b> — intensywność, czystość odcienia w danym kontekście.</p><ul><li>Porównuj kolory najpierw w skali szarości.</li><li>Nie zakładaj, że dodanie bieli tylko rozjaśnia — zwykle zmienia też chromę i temperaturę.</li><li>Przygaszanie koloru dopełniającym może zmienić również jego walor.</li></ul><p class="small-muted">Oparte na transkrypcji „Introduction to color mixing”.</p></article>
+   <article class="lesson-card"><h3>2. Dominanta, tonik i akcent</h3><p><b>Dominanta</b> to największa lub najsilniej organizująca rodzina barw. <b>Tonik</b> wspiera i różnicuje dominantę. <b>Akcent</b> pojawia się oszczędnie, by przyciągnąć uwagę.</p><ul><li>Wybierz jedną dominującą rodzinę, nie trzy równorzędne.</li><li>Tonik powtarzaj w kilku miejscach, aby spiąć obraz.</li><li>Akcent powinien być mały, ale dobrze umiejscowiony.</li></ul><p class="small-muted">Oparte na transkrypcji o harmonii barw i zasadzie 60/30/10; proporcje traktuj jako punkt wyjścia, nie sztywną regułę.</p></article>
+   <article class="lesson-card"><h3>3. Temperatura barwna</h3><p>Ciepło i chłód są relacyjne. Ten sam błękit może wyglądać cieplej obok zieleni, a chłodniej obok ultramaryny. Nie sprowadzaj temperatury do prostego podziału „żółty = ciepły, niebieski = zimny”.</p><ul><li>Porównuj dwa odcienie obok siebie.</li><li>W cieniach szukaj przesunięcia temperatury, a nie tylko ciemniejszej wersji lokalnej barwy.</li><li>Użyj temperatury do oddzielania planów i budowania atmosfery.</li></ul></article>
+   <article class="lesson-card"><h3>4. Harmonia i dopełnienia</h3><p>Barwy dopełniające leżą naprzeciw siebie w określonym modelu koła. Ich relacja zależy od przyjętego modelu i rzeczywistych pigmentów. Dwa różne koła (np. tradycyjne RYB i model oparty na cyan–magenta–yellow) nie wskazują identycznych par.</p><ul><li>Stosuj kontrast dopełniający w nierównych proporcjach.</li><li>Do neutralizacji dodawaj dopełnienie stopniowo, w małych porcjach.</li><li>Sprawdzaj mieszaninę na próbce po wyschnięciu.</li></ul><p class="small-muted">Oparte na transkrypcji o harmonii i pigmentach dopełniających.</p></article>
+   <article class="lesson-card"><h3>5. Mieszanie i kontrola chromy</h3><p>Nie każdą korektę wykonuj bielą lub czernią. Zmiana odcienia, temperatury i nasycenia wymaga różnych ruchów mieszania.</p><ul><li>Rozjaśniaj przez dodanie jaśniejszego koloru o odpowiedniej temperaturze, nie automatycznie bieli.</li><li>Przyciemniaj kolorem o niższym walorze i kontrolowanej temperaturze.</li><li>Przygaszaj dopełnieniem lub neutralną ziemią, pamiętając, że oba sposoby zmieniają charakter mieszanki.</li><li>Dodawaj pigment o dużej sile barwienia bardzo oszczędnie.</li></ul></article>
+   <article class="lesson-card"><h3>6. Czerń, biel i neutralne</h3><p>Czerń nie jest jedną uniwersalną substancją do cieni. Czerń może być chłodna lub ciepła, transparentna lub kryjąca, a jej mieszanie z żółcią może prowadzić do różnych zieleni zależnie od pigmentów.</p><ul><li>Testuj czerń w mieszankach z ochrą, sieną i błękitami.</li><li>Rozważ ciemne mieszanki z ultramaryny i ziemi palonej.</li><li>Biel stosuj świadomie: może obniżyć chromę i zmienić temperaturę.</li></ul><p class="small-muted">Oparte na transkrypcji „Introduction to black”.</p></article>
+   <article class="lesson-card"><h3>7. Paleta ograniczona</h3><p>Ograniczona paleta uczy relacji, zamiast mnożyć tubki. Wybierz ciepły i chłodny wariant podstawowych rodzin, kolor ziemi oraz biel. Zapisuj, jak konkretne pigmenty zachowują się w mieszankach.</p><ul><li>Ułóż farby w stałej kolejności na palecie.</li><li>Oddziel czyste kolory od mieszanek.</li><li>Przygotuj próbnik mieszanek i opisz pigmenty, nie tylko nazwy handlowe.</li></ul><p class="small-muted">Oparte na transkrypcji o palecie malarskiej i palecie pejzażowej.</p></article>
+   <article class="lesson-card"><h3>8. Karnacja i modelunek formy</h3><p>Kolor skóry nie jest jednolitym beżem. Wpływają na niego światło, półton, cień, odbicia otoczenia i lokalna temperatura. Modeluj formę przez relacje walorowe, a nie przez obrysowywanie jej czernią.</p><ul><li>Rozdziel światło, półton, cień własny i cień rzucony.</li><li>Utrzymuj różnicę temperatur między płaszczyznami, jeśli wspiera to światło.</li><li>Oceniaj krawędzie: ostre, miękkie i zatracone.</li></ul><p class="small-muted">Oparte na lekcji o kuli, walcu, świetle, cieniu i ograniczonej palecie do karnacji.</p></article>
+   <article class="lesson-card"><h3>9. Imprimatura i warstwowanie</h3><p>Kolor podmalówki wpływa na odbiór kolejnych warstw. Imprimatura może ujednolicić podłoże, wpłynąć na temperaturę obrazu i pomóc oceniać światła oraz cienie.</p><ul><li>Dobierz grunt do zamierzonego nastroju i zakresu walorów.</li><li>Nie zakrywaj automatycznie całej podmalówki — miejscowe prześwity mogą spajać obraz.</li><li>W malarstwie olejnym pilnuj zasady „tłuste na chude” i czasu schnięcia warstw.</li></ul><p class="small-muted">Oparte na transkrypcjach o czerni, imprimaturze i błędach początkujących w malarstwie olejnym.</p></article>
+  </div>
+ </div>
+<div class="card"><h2>Ćwiczenia w pracowni</h2><div class="workshop-grid">
+  <article class="lesson-card"><h3>Ćwiczenie: walor bez nazwy koloru</h3><p>Wybierz pięć kolorów z fotografii. Zrób zdjęcie lub próbkę w skali szarości. Uporządkuj od najjaśniejszego do najciemniejszego. Zwróć uwagę, czy dominanta nadal jest czytelna.</p></article>
+  <article class="lesson-card"><h3>Ćwiczenie: neutralizacja</h3><p>Wybierz kolor nasycony i jego dopełnienie. Przygotuj pięć mieszanek, za każdym razem dodając coraz mniej dopełnienia. Zapisz, w którym punkcie mieszanina staje się neutralna, a kiedy traci charakter.</p></article>
+  <article class="lesson-card"><h3>Ćwiczenie: 60 / 30 / 10</h3><p>Wykonaj trzy małe miniatury tej samej sceny. W pierwszej zastosuj dominującą rodzinę, tonik i akcent w proporcjach zbliżonych do 60/30/10; w drugiej odwróć proporcje; w trzeciej zachowaj dominującą barwę, ale zmień walor akcentu.</p></article>
+ </div></div>
+ </div>
+ <div class="workshop-pane" data-workshop-pane="wheels" role="tabpanel">
+<div class="card" id="classicColorWheel"><h2>Klasyczne koło barw</h2><p class="note">Wybierz punkt na kole albo użyj próbnika. Zobaczysz relacje barwne i gotowe zestawienie. Koło jest modelem relacji odcieni — pigmenty w farbach zachowują się inaczej niż światło na ekranie.</p>
+<div class="wheel-layout"><div><svg id="wheel" viewBox="0 0 420 420" role="img" aria-label="Interaktywne koło barw"><circle cx="210" cy="210" r="180" fill="#fff" stroke="#ddd"/></svg></div><div><h3>Kolor bazowy</h3><div class="controls"><input id="baseColor" type="color" value="#167c80"><span id="baseHex">#167C80</span></div><h3>Rodzaj zestawienia</h3><div class="scheme-list" id="schemes"><button class="active" data-s="analog">Sąsiednie</button><button data-s="comp">Dopełniające</button><button data-s="split">Rozdzielone</button><button data-s="triad">Triada</button><button data-s="tetrad">Tetrada</button><button data-s="mono">Monochromatyczne</button></div><div id="wheelResult" class="hexrow"></div><div id="schemeTip" class="tip"></div></div></div></div>
+ </div>
+ <div class="workshop-pane" data-workshop-pane="harmony" role="tabpanel">
+<div class="card">
+  <h2>Koła interaktywne</h2>
+  <p class="section-intro">Dwa interaktywne narzędzia do analizy koloru: koło chromatyczności pokazuje przejście od neutralności do czystego odcienia, koło harmonii buduje relacje między barwami, a Każde działa niezależnie od drugiego.</p>
+  <div class="wheel-tool-grid">
+   <article class="lesson-card wheel-tool">
+    <h3>1. Koło chromatyczności</h3>
+    <p>Wybierz odcień na obwodzie i poziom chromy, przesuwając się od środka ku krawędzi. Środek oznacza neutralność, a zewnętrzny pierścień — najbardziej nasycone barwy w tym modelu.</p>
+    <div class="interactive-wheel-wrap"><svg id="chromaWheel" viewBox="0 0 420 420" role="img" aria-label="Interaktywne koło chromatyczności"></svg></div>
+    <div class="controls"><label>Wybrany kolor <input id="chromaPicker" type="color" value="#C74735"></label><span id="chromaValue" class="small-muted">#C74735</span></div>
+    <div class="controls"><label for="chromaLightness">Walor</label><input id="chromaLightness" type="range" min="20" max="82" value="52"><output id="chromaLightnessValue">52%</output></div>
+    <div id="chromaReadout" class="tip">Kliknij kolorowy pierścień, aby odczytać barwę i chromę.</div>
+   </article>
+   <article class="lesson-card wheel-tool">
+    <h3>2. Koło harmonii</h3>
+    <p>Ustaw kolor bazowy, a następnie wybierz rodzaj harmonii. Linie na kole pokazują relacje, a próbki pod nim — konkretne kolory zestawienia.</p>
+    <div class="interactive-wheel-wrap"><svg id="harmonyWheel" viewBox="0 0 420 420" role="img" aria-label="Interaktywne koło harmonii barw"></svg></div>
+    <div class="controls"><label>Kolor bazowy <input id="harmonyPicker" type="color" value="#286A9B"></label><span id="harmonyValue" class="small-muted">#286A9B</span></div>
+    <div class="scheme-list" id="harmonyModes">
+     <button type="button" data-harmony="analog" class="active">Analogiczna</button>
+     <button type="button" data-harmony="complementary">Dopełniająca</button>
+     <button type="button" data-harmony="split">Rozdzielona</button>
+     <button type="button" data-harmony="triad">Triada</button>
+     <button type="button" data-harmony="tetrad">Tetrada</button>
+     <button type="button" data-harmony="mono">Monochromatyczna</button>
+    </div>
+    <div id="harmonySwatches" class="palette"></div>
+    <div id="harmonyReadout" class="tip"></div>
+   </article>
+   
+  </div>
+ </div>
+ </div>
+ <div class="workshop-pane" data-workshop-pane="pigments" role="tabpanel">
+<div class="card pigment-card">
+<article class="lesson-card wheel-tool">
+    <h3>Koło mieszania pigmentów</h3>
+    <p>Wybieraj farby z palety Renesans A’Kryl i obserwuj, jak zmienia się mieszanka. Wybierz dwa pigmenty oraz proporcję. To model poglądowy — prawdziwe farby nie mieszają się jak piksele.</p>
+    <div class="interactive-wheel-wrap"><svg id="pigmentWheel" viewBox="0 0 420 420" role="img" aria-label="Koło relacji pigmentów malarskich"></svg></div><div id="pigmentLegend" class="pigment-legend"></div>
+    <div class="controls"><label>Pigment A <select id="pigmentA"></select></label><label>Pigment B <select id="pigmentB"></select></label></div>
+    <div class="controls"><label for="pigmentRatio">Udział pigmentu A</label><input id="pigmentRatio" type="range" min="0" max="100" step="5" value="50"><output id="pigmentRatioValue">50% / 50%</output></div>
+    <div class="pigment-mix-preview"><div><span id="pigmentChipA"></span><small id="pigmentNameA"></small></div><div><span id="pigmentMixChip"></span><b>Mieszanka</b><small id="pigmentMixHex"></small></div><div><span id="pigmentChipB"></span><small id="pigmentNameB"></small></div></div>
+    <div id="pigmentMixNote" class="tip">Wybierz dwa pigmenty, aby zobaczyć orientacyjną mieszankę.</div>
+   </article>
+</div>
+<div class="card">
+  <h2>Katalog farb Renesans A’Kryl</h2>
+  <p class="section-intro">Katalog nazw i indeksów pigmentów z listy używanej przez moduł porównywania kolorów. Wartości HEX są orientacyjnymi próbkami cyfrowymi, a nie oficjalnym wzornikiem producenta. Sprawdź oznaczenia na własnej tubie i aktualnej karcie produktu.</p>
+  <div class="filterrow"><input id="renesansSearch" class="search-wide" type="search" placeholder="Szukaj farby lub indeksu pigmentu…"><select id="renesansGroup"><option value="all">Wszystkie kolory</option><option value="yellow">Żółcie i ochry</option><option value="red">Czerwienie i róże</option><option value="blue">Błękity i fiolety</option><option value="green">Zielenie</option><option value="earth">Ziemie i brązy</option><option value="neutral">Biele, szarości i czernie</option></select></div>
+  <p class="small-muted" id="renesansCount"></p>
+  <div id="renesansGallery" class="renesans-gallery"></div>
+  <div class="callout" id="renesansSelected">Kliknij próbkę farby, aby użyć jej jako pigmentu A w mieszalniku powyżej.</div>
+ </div>
+ </div>
+ <div class="workshop-pane" data-workshop-pane="skin" role="tabpanel">
+<div class="card">
+  <h2>Studium karnacji</h2>
+  <p class="section-intro">Przykładowe gamy do ćwiczenia portretu. Każdy zestaw pokazuje światło, półton, kolor lokalny, cień i odbicie. To propozycje edukacyjne — kolor skóry zależy od konkretnego oświetlenia, otoczenia i osoby, nie od sztywnej kategorii.</p>
+  <div id="skinToneGallery" class="skin-gallery"></div>
+ </div>
+ </div>
+ <div class="workshop-pane" data-workshop-pane="practice" role="tabpanel">
+<div class="card">
+  <h2>Ćwiczenia interaktywne</h2>
+  <p class="section-intro">Krótkie zadania sprawdzające rozumienie waloru, chromy, temperatury, harmonii i mieszania pigmentów. Po odpowiedzi otrzymasz wyjaśnienie, a wynik będzie liczony w tej sesji.</p>
+  <div class="exercise-topline"><span id="exerciseProgress">Zadanie 1 z 6</span><span id="exerciseScore">Wynik: 0 / 0</span></div>
+  <div id="exerciseQuestion" class="exercise-question"></div>
+  <div id="exerciseAnswers" class="exercise-answers"></div>
+  <div id="exerciseFeedback" class="tip" aria-live="polite">Wybierz odpowiedź, aby otrzymać informację zwrotną.</div>
+  <div class="actions" style="margin-top:12px"><button class="btn primary" id="exerciseNext" type="button" disabled>Następne zadanie</button><button class="btn" id="exerciseRestart" type="button">Zacznij od początku</button></div>
+ </div>
+ </div>
+</section>
+<section id="knowledge" class="panel">
+ <div class="card"><h2>Biblioteka wiedzy</h2><p class="section-intro">Dziewięć przekazanych transkrypcji uporządkowanych w bloki tematyczne. Poniższe notatki są redakcyjnymi streszczeniami tematów widocznych w materiałach; nie zastępują pełnych transkrypcji. Oryginalne pliki tekstowe znajdują się w folderze <b>materialy-zrodlowe</b>.</p>
+ <input id="knowledgeSearch" class="search-wide" type="search" placeholder="Szukaj w bibliotece: walor, kompozycja, czerń…">
+ <div class="knowledge-layout" style="margin-top:15px"><aside class="knowledge-nav" id="knowledgeNav">
+  <button class="active" data-k="color">Kolor i harmonia</button><button data-k="mix">Mieszanie i paleta</button><button data-k="black">Czerń, biel i imprimatura</button><button data-k="form">Forma, światło i cień</button><button data-k="oil">Technika olejna</button><button data-k="composition">Kompozycja</button><button data-k="golden">Złoty podział</button>
+ </aside><div id="knowledgeContent">
+  <article class="knowledge-entry" data-group="color"><span class="source-label">Transkrypcja: harmonia barw</span><h3>Harmonia, dopełnienia, dominanta i akcent</h3><p>Materiał wyjaśnia, że dopełnienie jest relacją między barwami po przeciwnych stronach określonego koła barw. Wskazuje też problem różnych modeli koła i tego, że pary dopełniające nie muszą być takie same w modelu RYB oraz CMY. W dalszej części pojawiają się dominanta, tonik, akcent i reguła 60/30/10.</p><p><b>Wniosek warsztatowy:</b> zanim wybierzesz parę dopełniającą, zdecyduj, czy pracujesz na modelu światła, czy na relacjach pigmentów. Proporcje potraktuj jako wskazówkę kompozycyjną, nie matematyczny przepis.</p></article>
+  <article class="knowledge-entry" data-group="mix"><span class="source-label">Transkrypcje: mieszanie koloru; paleta artysty</span><h3>Trzy wymiary koloru i praca z ograniczoną paletą</h3><p>Materiały omawiają barwę, walor i chromę, ograniczenia nasycenia, rozjaśnianie i przyciemnianie. Osobna transkrypcja pokazuje organizację palety, dobór bieli, kolejność farb oraz różnicę między paletą pejzażową i innymi zestawami.</p><p><b>Wniosek warsztatowy:</b> zapisuj pigmenty i proporcje w próbnikiem, ponieważ nazwa koloru handlowego nie mówi wszystkiego o sile barwienia, temperaturze ani zachowaniu mieszanki.</p></article>
+  <article class="knowledge-entry" data-group="black"><span class="source-label">Transkrypcja: Introduction to black</span><h3>Czerń, alternatywy dla czerni i imprimatura</h3><p>Materiał omawia zastosowanie czerni, jej alternatywy, mieszanie zieleni z czernią, historyczne użycie pigmentów, teorię Josefa Albersa oraz techniki imprimatury. Pojawiają się również przykłady demonstracyjne i budowanie świateł.</p><p><b>Wniosek warsztatowy:</b> nie zakładaj, że czerń zawsze daje ten sam efekt. Zrób próbki z konkretnymi żółciami, ziemiami i błękitami, a następnie porównaj ich walor i temperaturę.</p></article>
+  <article class="knowledge-entry" data-group="form"><span class="source-label">Transkrypcja: ball and cylinder</span><h3>Kula, walec, światło, cień i półton</h3><p>Materiał prowadzi przez podstawowe bryły, rozróżnienie światła i cienia, światło padające, cień własny i rzucony, półtony, krawędzie oraz rozwijanie partii światła. Omawia też tło i kompozycję jako elementy wspierające formę.</p><p><b>Wniosek warsztatowy:</b> ćwicz bryły w ograniczonej gamie. Najpierw ustaw trzy–pięć dużych wartości, dopiero potem przechodź do drobnych przejść i detali.</p></article>
+  <article class="knowledge-entry" data-group="oil"><span class="source-label">Transkrypcja: beginner oil painting mistakes</span><h3>Najczęstsze problemy w malarstwie olejnym</h3><p>Transkrypcja omawia wodę w farbie olejnej, niewłaściwą ilość oleju lub medium, zasadę „tłuste na chude” oraz ryzyko retuszowania warstwy w nieodpowiednim momencie schnięcia.</p><p><b>Wniosek warsztatowy:</b> planuj warstwy od chudszych do tłustszych, nie dodawaj medium bez potrzeby i obserwuj stan filmu malarskiego przed retuszem. Szczegóły zależą od pigmentu i użytego medium.</p></article>
+  <article class="knowledge-entry" data-group="composition"><span class="source-label">Transkrypcja: composition techniques</span><h3>Równowaga, linie opowiadające i uproszczenie</h3><p>Materiał porusza przełamywanie symetrii, równowagę przez proporcje wielkości elementów, linie prowadzące, regułę trójpodziału, głębię i perspektywę oraz upraszczanie sceny i skupianie uwagi na głównym motywie.</p><p><b>Wniosek warsztatowy:</b> kompozycja nie jest samym rozmieszczeniem obiektów. To organizacja kontekstu, która kieruje wzrokiem i pomaga wybrzmieć tematowi.</p></article>
+  <article class="knowledge-entry" data-group="golden"><span class="source-label">Transkrypcje: golden ratio; anatomy of a rectangle</span><h3>Złoty podział, ciąg Fibonacciego i dynamiczna geometria</h3><p>Materiały omawiają złoty podział, ciąg Fibonacciego, praktyczne przenoszenie proporcji na płótno, „anatomię prostokąta”, dynamiczną symetrię oraz kompozycję typu steelyard. Pojawia się również uproszczona metoda stosowania proporcji bez wykonywania obliczeń.</p><p><b>Wniosek warsztatowy:</b> złoty podział jest narzędziem organizacji przestrzeni, nie gwarancją udanej kompozycji. Sprawdź, czy linie i podziały rzeczywiście wzmacniają temat obrazu.</p></article>
+ </div></div>
+ <div class="callout"><b>Granica źródeł:</b> nie wszystkie szczegółowe proporcje, nazwy pigmentów i demonstracje da się bezpiecznie odtworzyć z samych tytułów rozdziałów. Dlatego nie dopisuję rzekomych cytatów ani nie przypisuję każdej wskazówki konkretnemu prowadzącemu bez weryfikacji pełnego fragmentu.</div>
+ </div>
+</section>
+<section id="compositions" class="panel">
+ <div class="card">
+  <h2>Kompozycja obrazu — atlas szkiców</h2>
+  <p class="section-intro">Proste schematy do szybkiego planowania obrazu. Każda miniatura pokazuje układ dużych mas, kierunek prowadzenia wzroku i orientacyjne położenie dominanty. To szkice konstrukcyjne, nie gotowe obrazy. Zmieniaj wielkość, odległości i proporcje pod własny temat.</p>
+  <div class="filterrow"><input id="compositionSearch" class="search-wide" type="search" placeholder="Szukaj: trójkąt, diagonalna, spirala…"><select id="compositionCategory"><option value="all">Wszystkie układy</option><option value="balance">Równowaga</option><option value="direction">Linie i kierunki</option><option value="geometry">Geometria</option><option value="groups">Grupy i rytm</option><option value="depth">Głębia i przestrzeń</option></select></div>
+  <p class="small-muted" id="compositionCount"></p>
+  <div class="comp-grid" id="compositionGallery"></div>
+ </div>
+
+ <div class="card">
+  <h2>Galeria kompozycji — pojedyncze przykłady</h2>
+  <p class="section-intro">Każda miniatura jest osobnym plikiem i osobną kartą. Kadry wycięto ponownie z oryginalnych plansz, zachowując pełne obramowania poszczególnych szkiców. Galeria zawiera przykłady geometrii, linii prowadzących, pejzażu, rozmieszczenia postaci, głębi oraz przestrzeni pozytywnej i negatywnej. Krótki opis podpowiada, na co zwrócić uwagę podczas planowania własnego obrazu.</p>
+  <div class="filterrow">
+   <input id="referenceCompositionSearch" class="search-wide" type="search" placeholder="Szukaj przykładu, np. spirala, pejzaż, równowaga…">
+   <select id="referenceCompositionCategory">
+    <option value="all">Wszystkie kategorie</option>
+    <option value="Geometria i podziały">Geometria i podziały</option>
+    <option value="Linie prowadzące">Linie prowadzące</option>
+    <option value="Kompozycje pejzażowe">Kompozycje pejzażowe</option>
+    <option value="Klasyczne zasady">Klasyczne zasady</option>
+    <option value="Kształty i równowaga">Kształty i równowaga</option>
+    <option value="Przestrzeń pozytywna i negatywna">Przestrzeń pozytywna i negatywna</option>
+    <option value="Linie i punkty skupienia">Linie i punkty skupienia</option>
+    <option value="Kompozycje postaci">Kompozycje postaci</option>
+    <option value="Głębia i kadrowanie">Głębia i kadrowanie</option>
+    <option value="Rytm i liczba elementów">Rytm i liczba elementów</option>
+   </select>
+  </div>
+  <p class="reference-count" id="referenceCompositionCount"></p>
+  <div class="reference-composition-grid" id="referenceCompositionGallery"></div>
+ </div>
+
+</section>
+<section id="masterpieces" class="panel">
+ <div class="card"><h2>Palety dzieł — inspiracje z historii sztuki</h2><p class="section-intro">Poniższe zestawienia są <b>przybliżonymi paletami odczytanymi z reprodukcji</b>, nie analizą laboratoryjną pigmentów ani rekonstrukcją oryginalnych mieszanek artysty. Kolor reprodukcji zależy od oświetlenia, druku, fotografii i ekranu. Oddzielam je od palet autorskich z biblioteki inspiracyjnej.</p>
+ <div class="master-grid">
+  <article class="master-card"><span class="source-label">Paleta dzieła · przybliżenie</span><h3>John Constable — The Hay Wain (1821)</h3><div class="strip"><span style="background:#3D4938"></span><span style="background:#6D7657"></span><span style="background:#9B8B69"></span><span style="background:#6A7778"></span><span style="background:#D5D1C5"></span></div><p>Oliwkowe i ziemiste zielenie, chłodne szarości nieba, brązy i przygaszone światło. Warto obserwować, jak niewielkie jasne refleksy w wodzie przełamują duże, ciemniejsze masy.</p><p class="small-muted"><a href="https://www.nationalgallery.org.uk/paintings/catalogues/egerton-2000/the-hay-wain" target="_blank" rel="noopener">National Gallery — katalog dzieła</a></p></article>
+  <article class="master-card"><span class="source-label">Paleta dzieła · przybliżenie</span><h3>Katsushika Hokusai — Wielka fala (ok. 1831)</h3><div class="strip"><span style="background:#1C4260"></span><span style="background:#3E7894"></span><span style="background:#A6C7D0"></span><span style="background:#E6E4D8"></span><span style="background:#B89A72"></span></div><p>Głębokie błękity, chłodne jasne tony piany, złamane biele i oszczędny akcent ciepłego beżu. Kontrast wartości i rytm kształtów są równie ważne jak sam dobór odcieni.</p><p class="small-muted"><a href="https://www.artic.edu/artworks/24645/under-the-wave-off-kanagawa-kanagawa-oki-nami-ura-also-known-as-the-great-wave-from-the-series-thirty-six-views-of-mount-fuji-fugaku-sanjurokkei" target="_blank" rel="noopener">Art Institute of Chicago — dzieło</a></p></article>
+  <article class="master-card"><span class="source-label">Paleta dzieła · przybliżenie</span><h3>Johannes Vermeer — Mleczarka (ok. 1660)</h3><div class="strip"><span style="background:#D6B64B"></span><span style="background:#426E83"></span><span style="background:#B88A51"></span><span style="background:#E6D7B8"></span><span style="background:#34352F"></span></div><p>Żółcie, błękity, ciepłe beże, przygaszone szarości i ciemne akcenty. Zwróć uwagę na kontrast temperatury oraz jasne światło, które modeluje postać i stół.</p><p class="small-muted"><a href="https://www.rijksmuseum.nl/en/collection/SK-A-2344" target="_blank" rel="noopener">Rijksmuseum — karta dzieła</a></p></article>
+  <article class="master-card"><span class="source-label">Paleta dzieła · przybliżenie</span><h3>Claude Monet — Waterloo Bridge (1901, pastel)</h3><div class="strip"><span style="background:#758B8B"></span><span style="background:#9BAFA8"></span><span style="background:#B5A4B1"></span><span style="background:#D7D7CC"></span><span style="background:#5D6E78"></span></div><p>Mglista gama turkusów, zieleni, lawendowych szarości i chłodnych świateł. To przykład, w którym chroma jest podporządkowana atmosferze i subtelnym różnicom waloru.</p><p class="small-muted"><a href="https://www.nga.gov/artworks/142268-waterloo-bridge" target="_blank" rel="noopener">National Gallery of Art — karta dzieła</a></p></article>
+ </div>
+ <div class="callout"><b>Ważne:</b> to nie są „oryginalne pigmenty Constable’a, Hokusai’a, Vermeera czy Moneta”. Są to edukacyjne próbki HEX przybliżające wygląd reprodukcji. Nie należy na ich podstawie przypisywać konkretnych pigmentów historycznym artystom.</div>
+ </div>
+</section>
+</main>
+<script>
+const $=s=>document.querySelector(s);
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===b.dataset.tab))});
+const names=[['#087F83','Turkus'],['#C99EAE','Pudrowy róż'],['#C5A15D','Złoto'],['#D9C5A8','Piaskowy'],['#A9C1D0','Błękit'],['#C66D4F','Terakota'],['#E5B7A5','Brzoskwinia'],['#526B58','Szałwia'],['#66536F','Śliwka'],['#D7B7C8','Wrzos'],['#E8DCC8','Kość słoniowa'],['#344D5B','Granat']];
+function colorCard(c){let [hex,name]=c;return `<div class="swatch"><div class="chip" style="background:${hex}" title="Kliknij, aby skopiować ${hex}" onclick="navigator.clipboard?.writeText('${hex}')"></div><b>${name}</b><small>${hex}</small></div>`}
+const data=[
+['Nadmorski poranek','Spokojne','Chłodne morze, ciepły piasek i delikatny akcent różu',['#176F78','#A9C3CC','#DCC9AD','#D5A9B6','#B58B55']],
+['Nadmorska elegancja','Romantyczne','Turkus, pudrowy róż, złoto i miękki błękit',['#087F83','#C99EAE','#C5A15D','#D9C5A8','#A9C1D0']],
+['Sól i terakota','Kontrastowe','Morski chłód przełamany rdzawą czerwienią',['#087C80','#C56F50','#E3B8A4','#D7C4A7','#A9C1D0']],
+['Zatoka o zmierzchu','Pejzaż','Granat, morska zieleń i przygaszone światło',['#243C4A','#356B70','#78918A','#D6A77B','#E7D6BD']],
+['Różowe wydmy','Romantyczne','Pastelowy róż z ciepłym piaskiem',['#B98291','#D7B5B8','#E8D8C2','#B9C5C2','#687D7C']],
+['Ogród po deszczu','Pejzaż','Zielenie, mokra ziemia i chłodne światło',['#354F3F','#6D876B','#A7B6A0','#8B6D5B','#D9D3C4']],
+['Złota godzina','Romantyczne','Miodowe światło, morela i śliwkowy cień',['#D59A48','#E7B77C','#C87861','#80566A','#4E536B']],
+['Stary port','Vintage','Patyna, drewno i wyblakły błękit',['#426B70','#8DA6A1','#B58D69','#D4C2A5','#725D52']],
+['Mak i len','Kontrastowe','Czerwień maku na tle lnianych beży',['#B83C35','#D77B61','#E6D8C1','#8A9A86','#4A5550']],
+['Cisza w lesie','Pejzaż','Głębokie zielenie z rozświetlonym kremem',['#263E35','#48664F','#8A9A76','#C5B78E','#E9E0C9']],
+['Lawendowy zmierzch','Romantyczne','Lawenda i ciepły róż w chłodnym świetle',['#6E668C','#A69AB9','#D3B8C1','#E7D5C7','#657B91']],
+['Cytrusy i cień','Kontrastowe','Kwaśna żółć, głęboki fiolet i zieleń',['#D6B52F','#78934B','#4B455F','#C46C48','#E9D9B5']],
+['Portret w świetle okna','Portret','Ciepła skóra, zgaszony błękit i brąz',['#C98568','#E4B99C','#8C6557','#657C8C','#D7C7B4']],
+['Porcelanowa lalka','Portret','Jasne róże i chłodne półcienie',['#E8C6BB','#C98E91','#A6A9B7','#77798B','#F0E4D7']],
+['Miodowy portret','Portret','Ochry, karmel i oliwkowy cień',['#C58B42','#E0B66F','#A96F4D','#59644A','#E8D9B9']],
+['Błękitny sen','Spokojne','Jasne błękity i miękkie szarości',['#7399B2','#A9C5D2','#D7E0DD','#B9A9A9','#E8D8C6']],
+['Zimowy ogród','Pejzaż','Srebrzyste szarości z jednym czerwonym akcentem',['#AEBBC0','#D9D9D2','#788A88','#8E4C4A','#F0E9DC']],
+['Jesienne liście','Pejzaż','Ogniste oranże i przygaszone oliwki',['#B85F36','#D18A45','#D5B76A','#6F7650','#4C5142']],
+['Morela i petrol','Kontrastowe','Nieoczywisty duet ciepłej moreli i petrolu',['#D98D6E','#E8B99B','#17636A','#344B52','#E8D9C8']],
+['Śliwka i musztarda','Kontrastowe','Głęboki fiolet przełamany złotą żółcią',['#563B59','#80607A','#C4A044','#E0C77C','#E9DDC9']],
+['Róż i oliwka','Kontrastowe','Romantyczny róż z ziemistą zielenią',['#C98F9D','#E0B7B7','#7B8054','#A4A078','#E8DCCB']],
+['Nocne niebo','Pejzaż','Granaty, atrament i ciepłe światło',['#172B45','#294A68','#5E7185','#D29A55','#E8D7B9']],
+['Kobalt i mandarynka','Kontrastowe','Mocny błękit z pomarańczowym akcentem',['#244F9A','#4B79B7','#E17A3D','#F0B56C','#E8E0D2']],
+['Mięta i koral','Romantyczne','Świeża mięta z miękkim koralem',['#79AAA0','#B5D0C3','#E58C79','#D7B0A5','#F1E6D6']],
+['Kredowy błękit','Spokojne','Pastelowa, rozbielona gama',['#B6CDD5','#D9E1DC','#E9D9C8','#C8B5B0','#8EABB2']],
+['Stare płótno','Vintage','Naturalne pigmenty, sepia i ochra',['#6B5142','#A47B53','#C5A16C','#D8C9A9','#7D8573']],
+['Czerwone jabłko','Kontrastowe','Czerwień i chłodna zieleń w spokojnych tonach',['#A93636','#D16D5D','#6F8B69','#B4B99B','#E6D9C4']],
+['Wrzosowisko','Pejzaż','Fiolety, zielenie i ziemiste tło',['#78617D','#A18AA1','#687B61','#B1A17E','#E1D4BD']],
+['Poranek w Prowansji','Romantyczne','Lawenda, len i oliwka',['#8D829F','#B7A9BC','#D9CBB6','#777D5A','#E9E0D1']],
+['Karmel i petrol','Kontrastowe','Ciepły karmel i chłodna głęboka zieleń',['#B8794C','#D6A16E','#145B60','#53817B','#E5D6C1']],
+['Szept różu','Spokojne','Bardzo subtelna gama do delikatnych scen',['#D8B7B8','#E8D6D0','#C7B8B0','#A6B4B1','#F0E9DF']],
+['Tropikalny ogród','Pejzaż','Szmaragd, limonka i kwiatowy róż',['#087E70','#4A9B79','#B7B84E','#D77F91','#F0D6B9']],
+['Ciepły monochrom','Vintage','Różne wartości jednej rodziny terakoty',['#713F35','#9C5948','#C77C62','#DFA88E','#F0D6C1']],
+['Chłodny portret','Portret','Błękitne półcienie i ciepła skóra',['#4F687D','#8499A4','#C78E77','#E0B49B','#E9DCCB']],
+['Zielone szkło','Spokojne','Szmaragd i mleczne, szkliste tony',['#1E6158','#54877A','#9CBBAA','#D3DCCB','#EAE4D6']],
+['Kwiat wiśni','Romantyczne','Róż, śliwka i świeża zieleń',['#D99AA8','#EBC7C7','#80566D','#789078','#F1E4D6']],
+['Miedź i błękit','Kontrastowe','Miedziany akcent na tle stalowego błękitu',['#B66D4B','#D59B75','#526E87','#91A8B5','#E4D8C6']],
+['Ziemia i niebo','Pejzaż','Naturalne brązy z chłodnym błękitem',['#795A43','#B28A62','#D6C4A7','#6F91A2','#B6C9C9']],
+['Kremowa wanilia','Spokojne','Jasne, ciepłe neutrale z oliwką',['#E8DCC5','#D5C2A5','#B4A184','#7F8063','#AEB8A9']],
+['Kobalt i ochra','Vintage','Klasyczne zestawienie o malarskim charakterze',['#28558B','#507AA3','#C69A43','#D8B86C','#E6D8BE']],
+['Nocny ogród','Kontrastowe','Ciemna zieleń, granat i świetlisty koral',['#203A32','#304C5A','#6E7661','#D77F68','#E7C9A9']],
+['Bursztyn i fiołek','Kontrastowe','Ciepły bursztyn kontra chłodny fiolet',['#C58A37','#E0B35E','#76658E','#A79AB5','#E8DCCB']],
+['Morska mgła','Pejzaż','Zgaszone turkusy i mglisty beż',['#4F8585','#83A9A6','#B8C9C2','#D8CBB7','#9DADB5']],
+['Kobalt i mandarynka','Kontrastowe','Chłodny kobalt, intensywny pomarańcz i złamana biel',['#164E9B','#F07824','#F6E9CF','#26324A','#6B9BCB']],
+['Karmin i szmaragd','Kontrastowe','Głęboka czerwień zestawiona z nasyconą zielenią',['#9E1838','#087A59','#E6C7B6','#263E36','#E8D8C5']],
+['Fuksja i limonka','Ekspresyjne','Odważny róż, kwaśna zieleń i głęboki grafit',['#E6007E','#B6D900','#24252B','#F4EBDD','#6C3B83']],
+['Ultramaryna i złoto','Kontrastowe','Intensywny błękit z ciepłym złotem i umbrowym cieniem',['#283C9D','#D6A52C','#77513B','#E9DCC5','#7192C5']],
+['Czerń i cynober','Ekspresyjne','Prawie czarne tło, czerwony akcent i chłodna biel',['#17191D','#D92732','#F1EEE7','#6D737A','#8D2430']],
+['Śliwka i chartreuse','Ekspresyjne','Głęboki fiolet przełamany żółtozielonym światłem',['#49234F','#A6B82A','#D8C6D9','#292C3C','#D68D4E']],
+['Lodowiec','Monochromatyczne','Chłodna gama błękitów i srebrzystych szarości',['#DDEAF0','#A9C8D7','#6D9BB4','#41677E','#243C50']],
+['Czerwień w pięciu tonach','Monochromatyczne','Od różowej czerwieni po ciemne bordo',['#F2A0A0','#D94C59','#B52343','#791C3B','#3C172A']],
+['Zieleń butelkowa','Monochromatyczne','Zróżnicowane zielenie od mięty po głęboką butelkę',['#B9D6C3','#72A88A','#39765D','#1D4B3D','#102D2A']],
+['Fiolet mineralny','Monochromatyczne','Lawenda, ametyst, śliwka i chłodny cień',['#D9C8E8','#B59ACD','#8666A6','#5D467D','#30263E']],
+['Żółć i sadza','Kontrastowe','Jaskrawa żółć z neutralnymi szarościami i czernią',['#F3D51B','#C6C2B8','#777A78','#343A3B','#15191A']],
+['Korall i petrol','Kontrastowe','Koralowa czerwień spotyka głęboki niebieskozielony',['#F06B58','#0B5960','#E8B9A5','#193B43','#D6C9B6']],
+['Pastelowy sorbet','Romantyczne','Mięta, cytryna, lawenda, brzoskwinia i róż',['#B9E2D2','#F3E7A6','#C8B8E3','#F3BFA7','#D98FA6']],
+['Neonowy zmierzch','Ekspresyjne','Cyjan i magenta na ciemnym fiolecie',['#00D6E8','#F21B8F','#3B1D64','#17162C','#F1F1E8']],
+['Rdza i błękit pruski','Pejzaż','Ciepła rdza kontrastuje z głębokim błękitem',['#A94F32','#D18B52','#173D58','#7E9BA0','#E3D6BD']],
+['Oliwka i róż','Kontrastowe','Ziemista oliwka i zgaszony róż z kremem',['#666B36','#9A9A5B','#C98C91','#E3C5B8','#423F35']],
+['Morze tropikalne','Pejzaż','Turkus, ultramaryna, limonka i piasek',['#00A6A6','#126A9C','#9CCB5B','#F0D59B','#17465A']],
+['Cegła i indygo','Vintage','Ceglana czerwień, indygo i papierowa biel',['#A74432','#303D70','#D9C9A8','#6D6257','#E9E0D1']],
+['Pustynia różowa','Pejzaż','Różowe piaski, fioletowy cień i wypłowiałe światło',['#D9A59D','#B97875','#856477','#E9D4B6','#6C7D83']],
+['Zimny metal','Monochromatyczne','Grafity, stalowy błękit i srebrzyste światło',['#D5DCE0','#9BAAB4','#60727F','#384A56','#1F2A32']],
+['Mak i ultramaryna','Ekspresyjne','Czerwień maku z intensywnym chłodnym błękitem',['#D42D35','#2549A4','#F0D9B5','#4A342D','#7B9ABF']],
+['Cytryna i lawenda','Kontrastowe','Jasna żółć zestawiona z fioletem i szarością',['#F2E64A','#8870A9','#D8D1D7','#48515E','#B6B58A']],
+['Miedź i morska zieleń','Vintage','Metaliczna miedź, patyna i ciemny turkus',['#B66A43','#D39A68','#286D68','#174A4B','#E0D1B9']],
+['Burgund i pudrowy błękit','Romantyczne','Głębokie bordo z delikatnym błękitem i perłową bielą',['#6D1938','#A64D67','#A8C4D3','#E7E4DE','#394A60']],
+['Wiosenna łąka','Pejzaż','Świeża zieleń, żółć, błękit i kwiatowy róż',['#6C9B3D','#C4D84B','#7DB9D0','#E8A1A8','#F2E7C8']],
+['Nocny karnawał','Ekspresyjne','Purpura, turkus, złoto i granat',['#5D1A70','#00A8A0','#E7B72E','#171C46','#F0D9E8']]
+
+];
+function toName(hex){
+ const clean=hex.replace('#','');
+ const r=parseInt(clean.slice(0,2),16)/255,g=parseInt(clean.slice(2,4),16)/255,b=parseInt(clean.slice(4,6),16)/255;
+ const max=Math.max(r,g,b),min=Math.min(r,g,b),delta=max-min,L=(max+min)/2;
+ let H=0,S=0;
+ if(delta>0.00001){
+  S=delta/(1-Math.abs(2*L-1));
+  if(max===r)H=60*(((g-b)/delta)%6);
+  else if(max===g)H=60*((b-r)/delta+2);
+  else H=60*((r-g)/delta+4);
+  if(H<0)H+=360;
+ }
+ const light=L*100,sat=S*100;
+ const near=(a,bv)=>Math.abs(a-bv);
+ // Neutrale i barwy złamane — nie nazywamy ich różem tylko dlatego, że R > G > B.
+ if(sat<11){
+  if(light<22)return 'Grafitowy / prawie czarny';
+  if(light<43)return H>12&&H<48?'Ciemny szarobrązowy':'Ciemny szary';
+  if(light<68)return H>12&&H<48?'Szarobrązowy (taupe)':'Szary';
+  return H>12&&H<55?'Ciepły jasny beż':'Jasny szary';
+ }
+ if(H>=18&&H<43){
+  if(light<23)return 'Bardzo ciemny brąz';
+  if(light<39)return sat<32?'Ciemny szarobrązowy':'Ciemny brąz';
+  if(light<57)return sat<24?'Ciepły szarobrązowy':(H<30?'Karmelowy brąz':'Ochra / ugier');
+  if(light<72)return sat<28?'Piaskowy beż':(H<29?'Toffi / karmel':'Złocisty beż');
+  return sat<27?'Jasny beż':'Piaskowy / miodowy';
+ }
+ if(H>=8&&H<18){
+  if(light<35)return 'Rdzawy brąz';
+  return light>65?'Brzoskwiniowy':'Terakotowy / rdzawy';
+ }
+ if(H>=0&&H<8||H>=350){
+  if(light<28)return 'Bordowy';
+  if(light<52)return 'Ciemna czerwień';
+  return sat<35?'Zgaszony róż':'Czerwień';
+ }
+ if(H>=330&&H<350){
+  if(light<35)return 'Śliwkowy / bordowy';
+  return light>58?'Pudrowy róż':'Malinowy';
+ }
+ if(H>=300&&H<330)return light<42?'Śliwkowy':'Magenta / fuksja';
+ if(H>=270&&H<300)return light<38?'Ciemny fiolet':'Fiolet';
+ if(H>=245&&H<270)return light<35?'Granatowo-fioletowy':'Fioletowo-niebieski';
+ if(H>=205&&H<245)return light<30?'Granatowy':(light>70?'Jasny błękit':'Niebieski');
+ if(H>=185&&H<205)return light>65?'Jasny turkus':'Turkus / morski';
+ if(H>=160&&H<185)return light<35?'Ciemny morski':'Morska zieleń';
+ if(H>=85&&H<160)return light<32?'Ciemna zieleń':(light>68?'Jasna zieleń':'Zieleń');
+ if(H>=60&&H<85)return light<35?'Oliwkowy ciemny':(light>70?'Limonkowy jasny':'Oliwkowy / żółtozielony');
+ if(H>=43&&H<60)return light<38?'Musztardowy ciemny':(light>70?'Jasny żółty':'Żółty / złoty');
+ return 'Odcień pośredni';
+}
+function drawPalettes(){let q=$('#search').value.toLowerCase(),cat=$('#category').value;$('#palettes').innerHTML=data.filter(d=>(cat==='all'||d[1]===cat)&&d.join(' ').toLowerCase().includes(q)).map((d,i)=>`<button class="pal-card" data-index="${data.indexOf(d)}"><h3>${d[0]}</h3><p>${d[1]} · ${d[2]}</p><div class="strip">${d[3].map(c=>`<span style="background:${c}"></span>`).join('')}</div></button>`).join('');document.querySelectorAll('.pal-card').forEach(b=>b.onclick=()=>showDetail(data[+b.dataset.index]))}
+function showDetail(d){$('#detail').classList.remove('hidden');$('#detailTitle').textContent=d[0];$('#detailDesc').textContent=d[2];$('#detailColors').innerHTML=d[3].map(c=>colorCard([c,toName(c)])).join('');$('#copyPalette').onclick=()=>navigator.clipboard?.writeText(d[3].join(', '));$('#detail').scrollIntoView({behavior:'smooth',block:'nearest'})}
+$('#search').oninput=drawPalettes;$('#category').onchange=drawPalettes;drawPalettes();
+let sourceImage=null;
+$('#drop').onclick=e=>{if(e.target!==$('#file'))$('#file').click()};$('#drop').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#file').click()}};
+$('#file').onchange=e=>loadImage(e.target.files[0]);
+function loadImage(f){if(!f)return;if(!f.type.startsWith('image/'))return alert('Wybierz plik graficzny.');let url=URL.createObjectURL(f);sourceImage=new Image();sourceImage.onload=()=>{$('#preview').src=url;$('#photoArea').classList.remove('hidden');analyze();};sourceImage.src=url}
+$('#drop').ondragover=e=>{e.preventDefault();$('#drop').style.background='#e8f0eb'};$('#drop').ondrop=e=>{e.preventDefault();$('#drop').style.background='';loadImage(e.dataTransfer.files[0])};
+$('#analyze').onclick=analyze;$('#count').onchange=analyze;
+function rgbLab(r,g,b){r/=255;g/=255;b/=255;let f=v=>v<=.04045?v/12.92:Math.pow((v+.055)/1.055,2.4);r=f(r);g=f(g);b=f(b);let x=(r*.4124+g*.3576+b*.1805)/.95047,y=(r*.2126+g*.7152+b*.0722),z=(r*.0193+g*.1192+b*.9505)/1.08883;let t=v=>v>.008856?Math.cbrt(v):7.787*v+16/116;let X=t(x),Y=t(y),Z=t(z);return [116*Y-16,500*(X-Y),200*(Y-Z)]}
+function labRgb(L,a,b){let y=(L+16)/116,x=a/500+y,z=y-b/200;let f=v=>v**3>.008856?v**3:(v-16/116)/7.787;x=.95047*f(x);y=f(y);z=1.08883*f(z);let r=x*3.2406+y*-1.5372+z*-.4986,g=x*-.9689+y*1.8758+z*.0415,bl=x*.0557+y*-.204+z*1.057;let cv=v=>Math.round(255*Math.max(0,Math.min(1,v<=.0031308?12.92*v:1.055*Math.pow(v,1/2.4)-.055)));return [cv(r),cv(g),cv(bl)]}
+const hexRGB=(r,g,b)=>'#'+[r,g,b].map(v=>Math.round(v).toString(16).padStart(2,'0')).join('').toUpperCase();
+
+let paintingStyle='layered';
+function safeHex(value,fallback='#B98E9C'){
+ const x=String(value||'').trim();
+ return /^#[0-9a-fA-F]{6}$/.test(x)?x:fallback;
+}
+
+function makePaintingPlan(input){
+ if(!input||!input.length){$('#paintingPlan').innerHTML='<p class="muted">Nie wykryto kolorów. Wybierz zdjęcie ponownie.</p>';return}
+ const colors=input.map((v,i)=>Array.isArray(v)?{hex:safeHex(v[0]),name:v[1]||toName(v[0]),n:1}:{hex:safeHex(v.hex),name:v.name||toName(v.hex),n:Math.max(1,Number(v.n)||1)}).filter(x=>x.hex);
+ if(!colors.length)return;
+ lastPaintingColors=colors;
+ const total=colors.reduce((s,c)=>s+c.n,0);
+ const ranked=[...colors].sort((a,b)=>b.n-a.n);
+ const dominant=ranked[0];
+ const second=ranked[1]||dominant;
+ const third=ranked[2]||second;
+ const [dh,ds,dl]=hexHsl(dominant.hex);
+ const [sh,ss,sl]=hexHsl(second.hex);
+ const [th,ts,tl]=hexHsl(third.hex);
+ const wrap=h=>((h%360)+360)%360;
+ const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+ const mixHue=(h1,h2,t)=>{let d=((h2-h1+540)%360)-180;return wrap(h1+d*t)};
+ const style=paintingStyle||'layered';
+ const configs={
+  layered:{groundHue:wrap(dh+165),groundL:.28,mainHue:dh,mainS:.82,mainL:clamp(dl,.34,.62),supportHue:mixHue(dh,sh,.65),supportL:clamp((sl+dl)/2,.32,.68),lightHue:mixHue(dh,sh,.35),lightL:.86,shadowHue:wrap(dh+205),shadowL:.16,accentHue:wrap(dh+180),accentS:.62,accentL:.48},
+  light:{groundHue:dh,groundL:.82,mainHue:dh,mainS:.48,mainL:.72,supportHue:wrap(sh-8),supportL:.68,lightHue:wrap(dh+12),lightL:.93,shadowHue:wrap(dh+190),shadowL:.38,accentHue:wrap(sh+35),accentS:.42,accentL:.57},
+  bold:{groundHue:wrap(dh+210),groundL:.17,mainHue:dh,mainS:.95,mainL:.52,supportHue:wrap(dh+120),supportL:.55,lightHue:wrap(dh+45),lightL:.82,shadowHue:wrap(dh+195),shadowL:.12,accentHue:wrap(dh+180),accentS:.92,accentL:.58},
+  warm:{groundHue:wrap(dh-18),groundL:.28,mainHue:wrap(dh+8),mainS:.78,mainL:.54,supportHue:wrap(dh+32),supportL:.57,lightHue:wrap(dh+18),lightL:.84,shadowHue:wrap(dh-25),shadowL:.18,accentHue:wrap(dh+180),accentS:.4,accentL:.46},
+  complementary:{groundHue:wrap(dh+180),groundL:.28,mainHue:dh,mainS:.82,mainL:.5,supportHue:wrap(dh+180),supportL:.56,lightHue:wrap(dh+35),lightL:.86,shadowHue:wrap(dh+205),shadowL:.17,accentHue:wrap(dh+180),accentS:.82,accentL:.55},
+  neon:{groundHue:wrap(dh+220),groundL:.12,mainHue:dh,mainS:1,mainL:.56,supportHue:wrap(dh+120),supportL:.56,lightHue:wrap(dh+40),lightL:.94,shadowHue:wrap(dh+220),shadowL:.08,accentHue:wrap(dh+180),accentS:1,accentL:.55}
+ };
+ const c=configs[style]||configs.layered;
+ const make=(h,s,l)=>hslHex(h,clamp(s,0,1),clamp(l,.06,.94));
+ const ground=make(c.groundHue,style==='light'?.18:.38,c.groundL);
+ const main=make(c.mainHue,Math.max(c.mainS,ds*.9),c.mainL);
+ const support=make(c.supportHue,Math.max(.24,ss*.8),c.supportL);
+ const light=make(c.lightHue,Math.max(.12,Math.min(.48,ds*.48)),c.lightL);
+ const shadow=make(c.shadowHue,.36,c.shadowL);
+ const accent=make(c.accentHue,c.accentS,c.accentL);
+ const roles=[[ground,'Grunt / podmalówka'],[main,'Dominanta — '+dominant.name],[support,'Półton / kolor wspierający'],[light,'Światło / przecierka'],[shadow,'Cień głęboki'],[accent,'Akcent kontrastowy']];
+ const descriptions={
+  layered:'Warstwowa: zachowuje odcień dominanty ze zdjęcia, ale buduje wokół niego grunt, półton, światło i kontrapunkt. Dobra do pracy z prześwitami i przecierkami.',
+  light:'Jasna: podnosi walor i ogranicza chromę. Kolor ze zdjęcia pozostaje rozpoznawalny, ale zostaje przeniesiony do delikatniejszej gamy.',
+  bold:'Ekspresyjna: wzmacnia nasycenie dominanty i wprowadza mocny kontrast. Stosuj intensywne kolory w nierównych proporcjach.',
+  warm:'Ciepła: przesuwa część relacji w stronę ochry, czerwieni i pomarańczu. Chłodny akcent zostaje dla równowagi.',
+  complementary:'Dopełniająca: zachowuje dominantę, a kolor naprzeciwko koła staje się kontrapunktem. Nie rozdzielaj ich po równo.',
+  neon:'Neonowa: radykalnie zwiększa chromę i kontrast walorowy. To wariant stylizowany, nie neutralna interpretacja fotografii.'
+ };
+ const dominantShare=Math.round(dominant.n/total*100);
+ const stages=[
+  ['1. Grunt',ground,`Zacznij od ${ground}. Połóż cienką, nierówną warstwę. Wariant gruntu jest dobrany jako tło dla dominanty ${dominant.name}.`],
+  ['2. Dominanta',main,`Największą powierzchnię przeznacz na kolor zbliżony do ${dominant.name}. W analizie stanowi on około ${dominantShare}% próbek, ale na płótnie możesz zmienić proporcje.`],
+  ['3. Półtony',support,`Wprowadź kolor wspierający w sąsiedztwie dominanty i w kilku oddalonych miejscach. Jeśli zlewa się z dominantą, zmień jego walor.`],
+  ['4. Światło',light,'Rozjaśnij wybrane płaszczyzny. Zostaw fragmenty podmalówki i nie pokrywaj jasnym kolorem całego obrazu.'],
+  ['5. Cienie',shadow,'Wprowadź ciemny ton w miejscach, które potrzebują głębi. Unikaj automatycznego użycia czerni.'],
+  ['6. Akcent',accent,'Użyj akcentu oszczędnie. Powtórz go w dwóch lub trzech punktach, aby nie wyglądał na przypadkową plamę.']
+ ];
+ const pct=style==='light'?[25,25,18,17,12,3]:style==='bold'?[18,32,18,10,14,8]:style==='neon'?[34,24,12,8,16,6]:style==='complementary'?[20,32,16,12,15,5]:[22,30,18,12,14,4];
+ $('#paintingPlan').innerHTML=`
+ <div class="tip"><b>${descriptions[style]}</b><br>Analiza wykryła ${colors.length} grup kolorystycznych. Największy udział ma <b>${dominant.name}</b> (${dominantShare}%). Drugi ważny kolor to <b>${second.name}</b>. Kolory planu są wyliczane z dominanty, barw wspierających oraz relacji na kole HSL — nie są losowane ani pobierane z jednej stałej palety.<br><br><b>Jak czytać tę propozycję:</b> to cyfrowa sugestia harmonii i rozkładu walorów. Nie jest gwarancją, że konkretne farby po zmieszaniu dadzą identyczny odcień. Sprawdź próbki pigmentów na swoim podłożu; farby różnią się temperaturą, kryciem i siłą barwienia.</div>
+ <div class="palette" style="margin:12px 0">${roles.map(([hex,label])=>colorCard([hex,label])).join('')}</div>
+ <div class="tip"><b>Proponowany podział powierzchni</b><br>${pct.map((v,i)=>`${roles[i][1]}: ${v}%`).join(' · ')}.<br><small>To punkt wyjścia do kompozycji, nie matematyczna recepta.</small></div>
+ ${stages.map(st=>`<div style="display:grid;grid-template-columns:42px 1fr;gap:10px;margin-top:13px;align-items:start"><div style="height:38px;border-radius:9px;background:${st[1]}"></div><div><b>${st[0]}</b><div class="muted">${st[2]}</div><small>${st[1]}</small></div></div>`).join('')}
+ <p class="note" style="margin-top:14px">Wskazówka: wykonaj próbki na tym samym podłożu, którego użyjesz w obrazie. Kolor cyfrowy jest tylko przybliżeniem pigmentu; krycie, temperatura i wysychanie farby zmienią efekt.</p>`;
+}
+
+document.addEventListener('click',e=>{
+ const b=e.target.closest('[data-painting-style]');if(!b)return;
+ paintingStyle=b.dataset.paintingStyle;
+ document.querySelectorAll('[data-painting-style]').forEach(x=>x.classList.toggle('active',x===b));
+ if(lastPaintingColors)makePaintingPlan(lastPaintingColors);
+});
+let lastPaintingColors=null;
+
+function analyze(){
+ if(!sourceImage)return;
+ let c=document.createElement('canvas'),ctx=c.getContext('2d',{willReadFrequently:true}),scale=Math.min(1,260/sourceImage.width,260/sourceImage.height);
+ c.width=Math.max(1,Math.round(sourceImage.width*scale));c.height=Math.max(1,Math.round(sourceImage.height*scale));
+ ctx.drawImage(sourceImage,0,0,c.width,c.height);
+ let dat=ctx.getImageData(0,0,c.width,c.height).data,pts=[];
+ for(let y=0;y<c.height;y++)for(let x=0;x<c.width;x++){
+  let i=(y*c.width+x)*4,r=dat[i],g=dat[i+1],b=dat[i+2];
+  if(dat[i+3]<180)continue;
+  pts.push({rgb:[r,g,b],lab:rgbLab(r,g,b)});
+ }
+ if(!pts.length){$('#paintingPlan').innerHTML='<p class="muted">Nie udało się odczytać pikseli z tego zdjęcia. Spróbuj innego pliku.</p>';return}
+ const k=Math.min(+$('#count').value,pts.length);let cent=[];
+ // Deterministyczny start: piksel o medianowym położeniu w obrazie.
+ cent.push(pts[Math.floor(pts.length*.43)].lab.slice());
+ // Kolejne centra wybieramy jako najdalsze od już wybranych — bez losowości.
+ while(cent.length<k){
+  let bestIndex=0,bestDistance=-1;
+  for(let i=0;i<pts.length;i++){
+   const nearest=Math.min(...cent.map(q=>dist(pts[i].lab,q)));
+   if(nearest>bestDistance){bestDistance=nearest;bestIndex=i}
+  }
+  cent.push(pts[bestIndex].lab.slice());
+ }
+ let groups=[];
+ for(let it=0;it<24;it++){
+  groups=cent.map(()=>({sum:[0,0,0],n:0}));
+  for(const p of pts){
+   let j=0,md=Infinity;
+   cent.forEach((q,i)=>{const d=dist(p.lab,q);if(d<md){md=d;j=i}});
+   const g=groups[j];g.sum[0]+=p.lab[0];g.sum[1]+=p.lab[1];g.sum[2]+=p.lab[2];g.n++;
+  }
+  cent=groups.map((g,i)=>g.n?g.sum.map(v=>v/g.n):cent[i]);
+ }
+ groups=cent.map(()=>({sum:[0,0,0],n:0}));
+ for(const p of pts){
+  let j=0,md=Infinity;
+  cent.forEach((q,i)=>{const d=dist(p.lab,q);if(d<md){md=d;j=i}});
+  const g=groups[j];g.sum[0]+=p.lab[0];g.sum[1]+=p.lab[1];g.sum[2]+=p.lab[2];g.n++;
+ }
+ const colors=groups.map(g=>{
+  if(!g.n)return null;
+  const lab=g.sum.map(v=>v/g.n),rgb=labRgb(...lab);
+  return {hex:hexRGB(...rgb),n:g.n};
+ }).filter(Boolean).sort((a,b)=>b.n-a.n);
+ makePaintingPlan(colors);
+ $('#extracted').innerHTML=colors.map(g=>colorCard([g.hex,toName(g.hex)])+`<small>${Math.round(g.n/pts.length*100)}% zdjęcia</small>`).join('');
+ renderPaintRecipes(colors);makeSuggestions(colors);
+}
+function dist(a,b){return (a[0]-b[0])**2+(a[1]-b[1])**2+(a[2]-b[2])**2}
+function hexHsl(hex){hex=safeHex(hex);let h=hex.slice(1),r=parseInt(h.slice(0,2),16)/255,g=parseInt(h.slice(2,4),16)/255,b=parseInt(h.slice(4,6),16)/255,max=Math.max(r,g,b),min=Math.min(r,g,b),d=max-min,H=0,S=max===0?0:d/(1-Math.abs(2*((max+min)/2)-1)),L=(max+min)/2;if(d){if(max===r)H=60*(((g-b)/d)%6);else if(max===g)H=60*((b-r)/d+2);else H=60*((r-g)/d+4)}return [((H+360)%360),S,L]}
+function hslHex(h,s,l){h=((h%360)+360)%360;s=Math.max(0,Math.min(1,s));l=Math.max(0,Math.min(1,l));let c=(1-Math.abs(2*l-1))*s,x=c*(1-Math.abs((h/60)%2-1)),m=l-c/2,r=0,g=0,b=0;if(h<60)[r,g,b]=[c,x,0];else if(h<120)[r,g,b]=[x,c,0];else if(h<180)[r,g,b]=[0,c,x];else if(h<240)[r,g,b]=[0,x,c];else if(h<300)[r,g,b]=[x,0,c];else[r,g,b]=[c,0,x];return hexRGB((r+m)*255,(g+m)*255,(b+m)*255)}
+
+// Katalog nazw i pigmentów Renesans A'Kryl — nazwy/pigmenty wg oficjalnej karty producenta.
+const renesans=[
+['Biel tytanowa','#f3f0e7','PW6'],['Biel antyczna','#e6d8bd','PW6 PY42'],['Żółta z Neapolu','#d8bb75','PW6 PY42 PY1'],['Żółta cytrynowa','#f0e02b','PY3'],['Żółta średnia','#e6c329','PY3 PY74'],['Żółta ciemna','#d9a51d','PY74'],['Żółta pomarańczowa','#e58a24','PY74 PO5'],['Cynober','#d94b35','PO5 PR112'],['Czerwień błyszcząca','#d92d2e','PR254'],['Magenta','#c32c78','PR122'],['Karmin','#a92b4c','PR170 PR122'],['Ugier żółty','#bd8739','PY42'],['Zieleń błyszcząca','#46a34b','PY3 PG7'],['Zieleń ciemna','#315c38','PY74 PG7'],['Zieleń ftalo','#087c52','PG7'],['Zieleń chromowa','#47734b','PG17'],['Zieleń soczysta','#659447','PG8'],['Błękit nieba','#79b9d4','PW6 PB15:1 PG7'],['Błękit ftalo','#087eaa','PB15:3'],['Ultramaryna','#343d9b','PB29'],['Granat marynarski','#25334e','PB15:1 PV23 PBk11'],['Fiolet','#654078','PV23'],['Ziemia sieneńska palona','#9b5039','PR101 PBk11'],['Ziemia brunatna','#79513d','PR101'],['Brunatna Van Dycka','#51443e','PR101 PBk11'],['Czerń karbonowa','#252525','PBk7'],['Kość słoniowa pastelowa','#d8c8a9','PW6 PY42 PR101'],['Cielisty jasny','#d89b8e','PR170 PR122'],['Cielisty ciemny','#a96e60','PW6 PR2 PR122'],['Bordowy','#672d43','PR170 PR122 PR101 PB29'],['Błękit królewski','#4168a1','PW6 PB15:3 PY42'],['Turkusowy','#269b9c','PW6 PG7 PB15:1'],['Błękit kobaltowy','#668eb5','PW6 PB15:1'],['Błękit pastelowy','#a5c6d6','PW6 PB15 PG7'],['Ziemia zielona','#758d70','PW6 PB15:3 PG8'],['Zieleń wenecka','#718b72','PW6 PB29 PG8'],['Zieleń Renesans','#5b936c','PW6 PB15 PG8'],['Zieleń ultramaryna','#176b60','PB15:3 PG7'],['Umbra','#665044','PR101 PBk11'],['Umbra palona','#513d35','PR101 PBk11'],['Zieleń oliwna','#7d7939','PY42 PY74 PG7'],['Szary mineralny jasny','#aaa69a','PW6 PY42 PR101 PBk7'],['Szary mineralny ciemny','#66665e','PW6 PY42 PBk7']
+];
+function hexDist(a,b){let A=a.match(/[0-9a-f]{2}/gi).map(x=>parseInt(x,16)),B=b.match(/[0-9a-f]{2}/gi).map(x=>parseInt(x,16));return Math.sqrt(A.reduce((v,x,i)=>v+(x-B[i])**2,0))}
+function renderPaintRecipes(colors){
+ let html='<h3>Jak uzyskać te kolory farbami akrylowymi Renesans A’Kryl?</h3><p class="note">Poniżej dobieram najbliższe odcienie z gamy Renesans i proponuję kierunek mieszania. Proporcje są orientacyjne — zacznij od małej porcji, dodawaj mocny pigment stopniowo i wykonaj próbkę po wyschnięciu.</p>';
+ colors.slice(0,7).forEach((g,i)=>{
+  let nearest=[...renesans].sort((a,b)=>hexDist(a[1],g.hex)-hexDist(b[1],g.hex)).slice(0,3);
+  let target=hexHsl(g.hex),light=target[2];
+  let modifiers=light<.28?'Biel tytanowa (rozjaśniaj stopniowo)':'';
+  if(light>.78)modifiers='Umbra lub ultramaryna (przyciemniaj minimalnie)';
+  let suggestions=nearest.map((p,j)=>`<div style="display:flex;gap:9px;align-items:center;margin:7px 0"><span style="width:30px;height:30px;border-radius:7px;background:${p[1]};border:1px solid #0001;flex:none"></span><span><b>${p[0]}</b> <small class="muted">${p[2]}</small><br><small class="muted">Najbliższy odcień katalogowy ${j===0?'— zacznij od niego':'— alternatywa'}</small></span></div>`).join('');
+  html+=`<div style="border-top:1px solid var(--line);padding:12px 0"><b>${i+1}. ${g.hex} — ${toName(g.hex)}</b><div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px"><div>${suggestions}</div><div class="tip"><b>Jak korygować mieszankę</b><br>${light>.68?'Jeśli farba jest za ciemna, dodawaj biel tytanową małymi porcjami.':light<.32?'Jeśli kolor jest zbyt jasny, dodawaj ciemniejszy odpowiednik lub odrobinę umbry.':'Zacznij od najbliższej farby; koryguj odcień niewielką ilością koloru sąsiedniego na kole barw.'}<br><br>Przygaszenie: odrobina koloru dopełniającego. ${modifiers}</div></div></div>`;
+ });
+ html+='<p class="note">Uwaga: wartości HEX farb są poglądowymi przybliżeniami, nie oficjalnymi wzornikami producenta. Rzeczywisty kolor zależy od partii, podłoża, grubości warstwy i wyschnięcia. Pigmenty i nazwy zaczerpnięto z palety A’Kryl Renesans.</p><p class="note"><a href="https://renesanspolska.pl/discover/farby-akrylowe/akryl/" target="_blank" rel="noopener">Oficjalna paleta A’Kryl Renesans i indeksy pigmentów</a></p>';
+ $('#paintRecipes').innerHTML=html;
+}
+function makeSuggestions(input){
+ const items=(input||[]).map(v=>Array.isArray(v)?{hex:safeHex(v[0]),name:v[1]||toName(v[0]),n:1}:{hex:safeHex(v.hex),name:v.name||toName(v.hex),n:Math.max(1,Number(v.n)||1)}).filter(x=>x.hex);
+ if(!items.length){$('#generated').innerHTML='<p class="muted">Nie udało się przygotować zestawień.</p>';return}
+ const ranked=[...items].sort((a,b)=>b.n-a.n),total=ranked.reduce((s,x)=>s+x.n,0),dom=ranked[0];
+ const [h,s,l]=hexHsl(dom.hex),wrap=x=>((x%360)+360)%360,clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+ const actual=ranked.slice(0,3).map(x=>x.hex);
+ const mk=(hh,ss,ll)=>hslHex(wrap(hh),clamp(ss,0,1),clamp(ll,.08,.92));
+ const sets=[
+  {title:'Harmonia bliska — barwy ze zdjęcia',desc:'Zachowuje dominantę i jedną z ważnych barw fotografii. Pozostałe odcienie sąsiadują z dominantą, ale różnią się walorem i nasyceniem.',colors:[dom.hex,...actual.slice(1,2),mk(h-26,Math.max(.2,s*.82),clamp(l-.12,.2,.78)),mk(h+22,Math.max(.18,s*.62),clamp(l+.14,.25,.88)),mk(h-8,s*.36,clamp(l+.28,.3,.9))]},
+  {title:'Kontrast dopełniający',desc:'Wyraźny kolor po przeciwnej stronie koła. Zachowaj go jako mniejszy akcent, jeśli nie chcesz, by zdominował zdjęciową gamę.',colors:[dom.hex,mk(h+180,Math.max(.48,s),clamp(l,.28,.68)),mk(h+180,.32,clamp(l+.2,.35,.82)),mk(h+155,.72,clamp(l-.12,.2,.65)),mk(h-8,.22,clamp(l+.3,.5,.9))]},
+  {title:'Triada — mocniejsza zmiana nastroju',desc:'Dwie dodatkowe rodziny barw są oddalone o około 120°. To wariant bardziej ekspresyjny, nie wierne odtworzenie fotografii.',colors:[dom.hex,mk(h+120,.72,.48),mk(h+240,.62,.42),mk(h+120,.3,.78),mk(h+240,.24,.78)]},
+  {title:'Gama przygaszona — malarska neutralizacja',desc:'Zachowuje rozpoznawalną dominantę, ale ogranicza chromę. Przydatna jako spokojniejsza alternatywa do obrazu o subtelnym nastroju.',colors:[dom.hex,mk(h-18,s*.34,clamp(l-.16,.18,.72)),mk(h+24,s*.26,clamp(l+.1,.3,.8)),mk(h+180,.16,.42),mk(h+12,.12,.84)]}
+ ];
+ const unique=a=>a.filter((c,i)=>a.indexOf(c)===i);
+ const dominantPct=Math.round(dom.n/total*100);
+ $('#generated').innerHTML=`<div class="tip"><b>Kolor prowadzący:</b> ${dom.name} (${dom.hex}), około ${dominantPct}% próbek. Zestawienia są obliczane geometrycznie na kole barw: analogia, dopełnienie, triada i neutralizacja. To nie jest losowanie. Pamiętaj jednak, że cyfrowe dopełnienie nie musi być idealnym dopełnieniem pigmentowym — farby mają własne widma, domieszki i siłę barwienia.</div>`+sets.map(z=>`<div style="margin-top:18px"><h3>${z.title}</h3><p class="note">${z.desc}</p><div class="palette">${unique(z.colors).map(c=>colorCard([c,toName(c)])).join('')}</div></div>`).join('');
+}
+
+$('#preview').onclick=e=>{let r=e.target.getBoundingClientRect(),x=Math.round((e.clientX-r.left)/r.width*sourceImage.width),y=Math.round((e.clientY-r.top)/r.height*sourceImage.height),c=document.createElement('canvas');c.width=c.height=1;let ctx=c.getContext('2d');ctx.drawImage(sourceImage,x,y,1,1,0,0,1,1);let d=ctx.getImageData(0,0,1,1).data,hex=hexRGB(d[0],d[1],d[2]);$('#picked').innerHTML=colorCard([hex,toName(hex)])};
+const wheel=$('#wheel'),svgNS='http://www.w3.org/2000/svg';let base='#167C80',scheme='analog';
+function renderWheel(){wheel.innerHTML='<circle cx="210" cy="210" r="180" fill="#fff" stroke="#ddd"/>';for(let i=0;i<360;i+=2){let p1=polar(210,210,95,i),p2=polar(210,210,180,i),p3=polar(210,210,180,i+2),p4=polar(210,210,95,i+2),el=document.createElementNS(svgNS,'path');el.setAttribute('d',`M${p1.x},${p1.y} L${p2.x},${p2.y} A180,180 0 0 1 ${p3.x},${p3.y} L${p4.x},${p4.y} A95,95 0 0 0 ${p1.x},${p1.y}`);el.setAttribute('fill',`hsl(${i},78%,54%)`);wheel.append(el)}let [h,s,l]=hexHsl(base);let angles=scheme==='analog'?[-30,0,30]:scheme==='comp'?[0,180]:scheme==='split'?[0,150,210]:scheme==='triad'?[0,120,240]:scheme==='tetrad'?[0,90,180,270]:[0,0,0,0];let hues=angles.map(a=>h+a);let center=document.createElementNS(svgNS,'circle');center.setAttribute('cx',210);center.setAttribute('cy',210);center.setAttribute('r',62);center.setAttribute('fill','#fffdfa');center.setAttribute('stroke','#ddd');wheel.append(center);let dot=document.createElementNS(svgNS,'circle');let p=polar(210,210,137,h);dot.setAttribute('cx',p.x);dot.setAttribute('cy',p.y);dot.setAttribute('r',10);dot.setAttribute('fill','#fff');dot.setAttribute('stroke','#222');dot.setAttribute('stroke-width',3);wheel.append(dot);let pts=hues.map(a=>polar(210,210,137,a));if(pts.length>1){let line=document.createElementNS(svgNS,'polygon');line.setAttribute('points',pts.map(p=>`${p.x},${p.y}`).join(' '));line.setAttribute('fill','#fff8');line.setAttribute('stroke','#333');line.setAttribute('stroke-width',2);wheel.append(line)}$('#baseHex').textContent=base.toUpperCase();let cols=hues.map((a,i)=>scheme==='mono'?hslHex(h,s,[.3,.42,.55,.68][i%4]):hslHex(a,Math.max(.25,s),l));$('#wheelResult').innerHTML=cols.map(c=>`<button onclick="navigator.clipboard?.writeText('${c}')"><div class="chip" style="background:${c}"></div><small>${c}</small></button>`).join('');let desc={analog:'Sąsiednie odcienie tworzą płynne, spokojne przejścia. Dobre do nieba, wody i harmonijnych pejzaży.',comp:'Barwa dopełniająca leży naprzeciwko. Użyj jej jako akcentu albo do tonowania barwy w mieszance.',split:'Dwa sąsiednie odcienie po przeciwnej stronie koła dają kontrast mniej dosłowny niż para dopełniająca.',triad:'Trzy równomiernie rozłożone barwy dają żywą, ale uporządkowaną kompozycję.',tetrad:'Dwie pary dopełniające. Wybierz jedną dominantę, pozostałe stosuj oszczędniej.',mono:'Jedna rodzina barw w kilku jasności/nasyceniach. Spójna i subtelna gama.'};$('#schemeTip').textContent=desc[scheme]}
+function polar(cx,cy,r,a){let t=(a-90)*Math.PI/180;return{x:cx+r*Math.cos(t),y:cy+r*Math.sin(t)}}
+wheel.onclick=e=>{let r=wheel.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*420-210,y=(e.clientY-r.top)/r.height*420-210,h=(Math.atan2(x,-y)*180/Math.PI+360)%360;base=hslHex(h,.65,.48);$('#baseColor').value=base;renderWheel()};
+$('#baseColor').oninput=e=>{base=e.target.value;renderWheel()};$('#schemes').onclick=e=>{let b=e.target.closest('button');if(!b)return;scheme=b.dataset.s;document.querySelectorAll('#schemes button').forEach(x=>x.classList.toggle('active',x===b));renderWheel()};renderWheel();
+
+</script>
+
+<script>
+(function(){
+ const nav=document.getElementById('knowledgeNav');
+ const content=document.getElementById('knowledgeContent');
+ if(nav&&content){
+  nav.addEventListener('click',function(e){
+   const b=e.target.closest('button[data-k]'); if(!b)return;
+   nav.querySelectorAll('button').forEach(x=>x.classList.toggle('active',x===b));
+   const group=b.dataset.k;
+   content.querySelectorAll('.knowledge-entry').forEach(card=>{
+    card.style.display=(card.dataset.group===group)?'block':'none';
+   });
+   const search=document.getElementById('knowledgeSearch'); if(search)search.value='';
+  });
+  const first=nav.querySelector('button[data-k]');
+  if(first)first.click();
+ }
+ const search=document.getElementById('knowledgeSearch');
+ if(search&&content){
+  search.addEventListener('input',function(){
+   const q=this.value.trim().toLocaleLowerCase('pl');
+   content.querySelectorAll('.knowledge-entry').forEach(card=>{
+    card.style.display=(!q||card.textContent.toLocaleLowerCase('pl').includes(q))?'block':'none';
+   });
+   if(q&&nav)nav.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
+  });
+ }
+ // Avoid broken-image gaps if a remote artwork source is temporarily unavailable.
+ document.querySelectorAll('.comp-card img').forEach(img=>{
+  img.addEventListener('error',function(){
+   this.style.display='none';
+   const note=document.createElement('div');
+   note.className='comp-schematic';
+   note.textContent='Reprodukcja dostępna po otwarciu źródła dzieła';
+   this.insertAdjacentElement('afterend',note);
+  },{once:true});
+ });
+})();
+</script>
+
+
+<script>
+(function(){
+ const entries=[
+ ['Steelyard — waga nierównoramienna','balance','Duża masa po jednej stronie równoważy mały, mocny akcent po drugiej. Dobre do pejzażu z ciężkim drzewem i małym jasnym motywem.','<path class="sketch-line" d="M48 125 L210 82 L350 125"/><path class="sketch-line" d="M210 82 L210 145"/><path class="sketch-dark" d="M40 126 Q78 72 120 126 Z"/><circle class="sketch-focus" cx="335" cy="125" r="16"/><path class="sketch-guide" d="M210 35 V160"/>'],
+ ['Balanced Scales — waga symetryczna','balance','Dwie zbliżone masy po obu stronach osi dają stabilność. Różnicuj ich kształt, żeby układ nie był mechaniczny.','<path class="sketch-line" d="M210 40 V145 M80 85 H340"/><path class="sketch-line" d="M95 85 L70 130 H120 Z M325 85 L300 130 H350 Z"/><path class="sketch-dark" d="M65 130 Q95 150 125 130 Z"/><path class="sketch-mass" d="M295 130 Q325 150 355 130 Z"/>'],
+ ['Trójkąt / piramida','geometry','Szeroka podstawa i zwężająca się góra porządkują grupę postaci lub martwą naturę. Najważniejszy punkt może znajdować się przy wierzchołku.','<path class="sketch-guide" d="M210 28 L65 155 H355 Z"/><path class="sketch-mass" d="M185 52 L145 145 H275 L235 52 Z"/><circle class="sketch-focus" cx="210" cy="52" r="13"/><circle class="sketch-dark" cx="145" cy="125" r="20"/><circle class="sketch-light" cx="275" cy="125" r="20"/>'],
+ ['Odwrócony trójkąt','geometry','Wąska podstawa i szeroka góra tworzą napięcie. Sprawdza się w układach dynamicznych, ale wymaga mocnego podparcia wizualnego.','<path class="sketch-guide" d="M65 35 H355 L210 160 Z"/><path class="sketch-dark" d="M85 48 H335 L210 142 Z"/><circle class="sketch-focus" cx="210" cy="140" r="12"/>'],
+ ['O / układ kolisty','geometry','Masy prowadzą wzrok po obwodzie. Zostaw przerwę w okręgu, jeśli kompozycja ma pozostać otwarta.','<path class="sketch-line" d="M210 28 C305 25 360 75 355 115 C350 155 285 165 210 160 C120 165 65 125 70 80 C75 40 145 25 210 28 Z"/><circle class="sketch-focus" cx="210" cy="92" r="18"/><circle class="sketch-light" cx="115" cy="75" r="17"/><circle class="sketch-dark" cx="300" cy="125" r="22"/>'],
+ ['S-curve — krzywa prowadząca','direction','Krzywa S prowadzi od pierwszego planu do dominanty w głębi. Zmieniaj szerokość i kontrast kolejnych fragmentów.','<path class="sketch-line" d="M60 160 C100 120 80 85 155 82 C235 78 180 28 275 32 C320 34 330 48 350 22"/><path class="sketch-guide" d="M60 160 C100 120 80 85 155 82 C235 78 180 28 275 32 C320 34 330 48 350 22"/><circle class="sketch-focus" cx="275" cy="32" r="13"/>'],
+ ['Diagonalna — ruch po przekątnej','direction','Główna masa biegnie po przekątnej, nadając scenie ruch. Przeciwstaw jej mniejszy element, by utrzymać równowagę.','<path class="sketch-guide" d="M45 155 L350 25"/><path class="sketch-dark" d="M45 130 L145 90 L180 125 L75 160 Z"/><path class="sketch-mass" d="M220 65 L315 28 L350 55 L260 95 Z"/><circle class="sketch-focus" cx="230" cy="82" r="13"/>'],
+ ['L / układ kątowy','geometry','Dwie masy tworzą kąt przy krawędziach. Pusta przestrzeń w środku może stać się miejscem dla dominanty.','<path class="sketch-dark" d="M45 25 H125 V135 H355 V160 H45 Z"/><circle class="sketch-focus" cx="235" cy="80" r="18"/><path class="sketch-guide" d="M125 135 L235 80"/>'],
+ ['Krzyż / osie przecinające się','geometry','Dwie osie porządkują przestrzeń, a punkt przecięcia skupia uwagę. Unikaj dzielenia płótna na cztery równe, martwe pola.','<path class="sketch-line" d="M55 90 H365 M210 20 V165"/><path class="sketch-guide" d="M85 30 L335 150 M335 30 L85 150"/><circle class="sketch-focus" cx="210" cy="90" r="18"/>'],
+ ['Promieniowanie do dominanty','direction','Linie i krawędzie zbiegają się w jednym obszarze. Dobrze buduje głębię i mocny punkt skupienia.','<path class="sketch-guide" d="M35 25 L210 90 L365 20 M35 155 L210 90 L365 155 M210 10 L210 90"/><circle class="sketch-focus" cx="210" cy="90" r="20"/><path class="sketch-mass" d="M35 25 L75 40 L60 65 Z M325 35 L365 20 L350 65 Z"/>'],
+ ['Trzy plamy — Three Spot','groups','Trzy główne skupiska tworzą rytm. Największa plama powinna prowadzić, a dwie mniejsze odpowiadać jej wielkością lub kierunkiem.','<circle class="sketch-dark" cx="110" cy="118" r="38"/><circle class="sketch-focus" cx="255" cy="62" r="22"/><circle class="sketch-light" cx="315" cy="137" r="15"/><path class="sketch-guide" d="M110 118 L255 62 L315 137"/>'],
+ ['Group Mass — grupa mas','groups','Kilka elementów czyta się jako jedna większa bryła. Uprość detale i pilnuj obrysu grupy.','<path class="sketch-mass" d="M70 130 Q55 85 95 65 Q120 35 155 68 Q185 40 210 78 Q245 55 260 95 Q305 88 320 135 Z"/><circle class="sketch-focus" cx="195" cy="90" r="13"/><path class="sketch-guide" d="M70 145 H320"/>'],
+ ['Tunel / funnel — prowadzenie w głąb','depth','Powtarzające się ramy zmniejszają się ku środkowi i tworzą głębię. Punkt zbiegu powinien mieć znaczenie dla tematu.','<path class="sketch-line" d="M45 25 H375 V155 H45 Z M90 48 H330 V135 H90 Z M140 68 H280 V115 H140 Z"/><circle class="sketch-focus" cx="210" cy="91" r="10"/><path class="sketch-guide" d="M45 25 L210 91 L375 25 M45 155 L210 91 L375 155"/>'],
+ ['Natural frame — rama naturalna','depth','Gałęzie, architektura lub cień tworzą ramę wokół motywu. Rama ma prowadzić, nie konkurować z tematem.','<path class="sketch-dark" d="M40 20 Q110 25 120 80 Q85 50 40 65 Z M360 20 Q290 25 280 80 Q315 50 360 65 Z M40 20 V160 H65 V70 M360 20 V160 H335 V70"/><circle class="sketch-focus" cx="210" cy="95" r="28"/><path class="sketch-guide" d="M120 80 Q210 10 280 80"/>'],
+ ['Złoty podział — przesunięta dominanta','geometry','Dominanta leży poza środkiem, w pobliżu podziału około 1:1,618. Linie pomocnicze pomagają ustawić masy, ale nie zastępują oceny obrazu.','<path class="sketch-guide" d="M170 15 V165 M45 75 H375 M250 15 V165 M45 115 H375"/><circle class="sketch-focus" cx="250" cy="75" r="20"/><path class="sketch-dark" d="M50 120 Q90 85 135 120 L135 160 H50 Z"/><path class="sketch-light" d="M285 125 Q325 95 365 125 V160 H285 Z"/>'],
+ ['Złoty trójkąt','geometry','Ukośne podziały dzielą prostokąt na trójkąty. Użyj ich, gdy temat opiera się na kierunku i napięciu diagonalnym.','<path class="sketch-guide" d="M45 20 L375 160 M45 160 L375 20 M45 20 L375 20 L375 160 Z"/><circle class="sketch-focus" cx="245" cy="105" r="18"/><path class="sketch-dark" d="M45 160 L145 115 L185 160 Z"/>'],
+ ['Poziomy rytm','direction','Warstwy poziome uspokajają scenę i pomagają budować pejzaż. Zmieniaj wysokość pasów, by uniknąć monotonii.','<path class="sketch-dark" d="M45 25 H375 V60 H45 Z"/><path class="sketch-mass" d="M45 65 Q110 55 170 70 T375 65 V105 H45 Z"/><path class="sketch-light" d="M45 112 Q140 100 220 118 T375 110 V160 H45 Z"/><path class="sketch-guide" d="M45 60 H375 M45 108 H375"/>'],
+ ['Pionowy rytm','direction','Pionowe formy budują monumentalność i stabilność. Przełam rytm jedną formą poziomą lub diagonalną.','<path class="sketch-dark" d="M70 25 H105 V160 H70 Z M160 15 H190 V160 H160 Z M260 30 H300 V160 H260 Z"/><path class="sketch-mass" d="M45 130 H355 V150 H45 Z"/><circle class="sketch-focus" cx="175" cy="58" r="13"/>'],
+ ['Zygzak / zigzag','direction','Powtarzające się załamania prowadzą wzrok skokowo. Dobrze sprawdzają się w skałach, dachach, gałęziach i dynamicznym pejzażu.','<path class="sketch-line" d="M45 145 L115 40 L175 120 L245 35 L315 115 L370 45"/><circle class="sketch-focus" cx="245" cy="35" r="13"/><path class="sketch-light" d="M70 150 L115 85 L145 150 Z"/>'],
+ ['Łuk / arch','geometry','Duży łuk otacza lub osłania motyw. Daje wrażenie schronienia i kieruje wzrok do środka.','<path class="sketch-line" d="M55 155 V100 C55 5 365 5 365 100 V155"/><path class="sketch-dark" d="M80 155 V100 C80 35 340 35 340 100 V155 Z"/><circle class="sketch-focus" cx="210" cy="105" r="19"/>'],
+ ['Spirala','direction','Ruch spiralny stopniowo prowadzi do środka lub na zewnątrz. Stosuj go subtelnie, aby nie wyglądał jak dekoracyjny ornament.','<path class="sketch-line" d="M210 90 C240 55 300 65 300 105 C300 155 220 165 170 135 C105 95 155 20 235 25 C330 28 360 120 300 155"/><circle class="sketch-focus" cx="210" cy="90" r="12"/>'],
+ ['Półksiężyc / crescent','geometry','Masy układają się w łuk, pozostawiając otwartą przestrzeń po jednej stronie. Daje równowagę bez pełnego zamknięcia koła.','<path class="sketch-dark" d="M290 25 C180 5 80 50 75 105 C70 160 170 175 260 145 C180 150 135 110 150 75 C165 40 225 25 290 25 Z"/><circle class="sketch-focus" cx="285" cy="105" r="16"/>'],
+ ['Asymetryczna równowaga','balance','Dwie różne masy równoważą się dzięki wielkości, walorowi i położeniu. Sprawdź obraz jako małą miniaturę.','<path class="sketch-dark" d="M55 35 Q145 20 155 100 Q145 160 55 145 Z"/><circle class="sketch-focus" cx="295" cy="88" r="25"/><circle class="sketch-light" cx="345" cy="130" r="10"/><path class="sketch-guide" d="M35 90 H375"/>'],
+ ['Symetria osiowa','balance','Oś centralna porządkuje elementy. Drobne różnice w kształtach i detalach mogą dodać życia bez utraty stabilności.','<path class="sketch-guide" d="M210 15 V165"/><path class="sketch-dark" d="M190 35 Q95 25 80 90 Q95 150 190 145 Z"/><path class="sketch-mass" d="M230 35 Q325 25 340 90 Q325 150 230 145 Z"/><circle class="sketch-focus" cx="210" cy="90" r="13"/>'],
+ ['Kadr w kadrze','depth','Mniejszy prostokąt wewnątrz obrazu tworzy drugi plan i kieruje uwagę do centrum. Dobrze działa w architekturze i wnętrzach.','<rect class="sketch-line" x="55" y="22" width="310" height="136"/><rect class="sketch-guide" x="115" y="45" width="190" height="90"/><circle class="sketch-focus" cx="210" cy="90" r="20"/><path class="sketch-dark" d="M55 22 H95 V158 H55 Z"/>'],
+ ['Rozproszone punkty / rytm','groups','Wiele małych akcentów tworzy rytm, ale jedna grupa powinna być wyraźnie ważniejsza. Zmieniaj odstępy i wielkości.','<circle class="sketch-light" cx="75" cy="45" r="9"/><circle class="sketch-light" cx="125" cy="85" r="13"/><circle class="sketch-mass" cx="175" cy="45" r="17"/><circle class="sketch-focus" cx="245" cy="95" r="29"/><circle class="sketch-dark" cx="325" cy="45" r="14"/><circle class="sketch-light" cx="330" cy="145" r="9"/><path class="sketch-guide" d="M75 45 Q180 5 245 95 T330 145"/>']
+ ];
+ function svg(entry){
+  return `<svg viewBox="0 0 420 180" role="img" aria-label="Schemat kompozycji: ${entry[0]}"><rect class="sketch-frame" x="18" y="10" width="384" height="160" rx="2"/>${entry[3]}</svg>`;
+ }
+ const gallery=document.getElementById('compositionGallery'),search=document.getElementById('compositionSearch'),category=document.getElementById('compositionCategory'),count=document.getElementById('compositionCount');
+ function draw(){
+  const q=(search.value||'').toLocaleLowerCase('pl'),cat=category.value;
+  const list=entries.filter(e=>(cat==='all'||e[1]===cat)&&e.slice(0,3).join(' ').toLocaleLowerCase('pl').includes(q));
+  count.textContent=`Wyświetlono ${list.length} z ${entries.length} szkiców`;
+  gallery.innerHTML=list.map(e=>`<article class="comp-card"><div class="composition-sketch">${svg(e)}</div><div class="comp-copy"><span class="source-label">${({balance:'Równowaga',direction:'Linie i kierunki',geometry:'Geometria',groups:'Grupy i rytm',depth:'Głębia i przestrzeń'})[e[1]]}</span><h3>${e[0]}</h3><p>${e[2]}</p></div></article>`).join('');
+ }
+ if(gallery){search.addEventListener('input',draw);category.addEventListener('change',draw);draw()}
+})();
+</script>
+
+
+<script>
+(function(){
+ const $id=id=>document.getElementById(id);
+ const svgNS='http://www.w3.org/2000/svg';
+ const polar=(cx,cy,r,a)=>{const t=(a-90)*Math.PI/180;return{x:cx+r*Math.cos(t),y:cy+r*Math.sin(t)}};
+ const annular=(cx,cy,r1,r2,a1,a2)=>{
+  const p1=polar(cx,cy,r2,a1),p2=polar(cx,cy,r2,a2),p3=polar(cx,cy,r1,a2),p4=polar(cx,cy,r1,a1);
+  const large=(a2-a1)>180?1:0;
+  return `M${p1.x} ${p1.y} A${r2} ${r2} 0 ${large} 1 ${p2.x} ${p2.y} L${p3.x} ${p3.y} A${r1} ${r1} 0 ${large} 0 ${p4.x} ${p4.y} Z`;
+ };
+ const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+ const hueNames=['czerwony','czerwono-pomarańczowy','pomarańczowy','żółto-pomarańczowy','żółty','żółto-zielony','zielony','turkusowy','cyjanowy','niebieski','fioletowy','purpurowy'];
+ function addSvg(parent,tag,attrs){const el=document.createElementNS(svgNS,tag);Object.entries(attrs||{}).forEach(([k,v])=>el.setAttribute(k,v));parent.appendChild(el);return el}
+
+ // 1) Chromaticity wheel: hue around, chroma from centre to rim, adjustable value.
+ const chromaSvg=$id('chromaWheel'),chromaPicker=$id('chromaPicker'),chromaLight=$id('chromaLightness');
+ let chromaHue=0,chromaSat=.72,chromaValue=52;
+ function renderChroma(){
+  if(!chromaSvg)return;
+  chromaSvg.innerHTML='';
+  addSvg(chromaSvg,'circle',{cx:210,cy:210,r:184,fill:'#f8f6f0',stroke:'#c9c1b5','stroke-width':2});
+  const bands=[{r1:34,r2:70,s:.18},{r1:70,r2:108,s:.4},{r1:108,r2:146,s:.65},{r1:146,r2:180,s:.95}];
+  for(let i=0;i<36;i++){
+   const h=i*10;
+   bands.forEach((b,j)=>addSvg(chromaSvg,'path',{d:annular(210,210,b.r1,b.r2,h-5,h+5),fill:hslHex(h,b.s,chromaValue/100),class:'wheel-segment','data-hue':h,'data-chroma':b.s}));
+  }
+  addSvg(chromaSvg,'circle',{cx:210,cy:210,r:28,fill:hslHex(chromaHue,0,chromaValue/100),stroke:'#aaa','stroke-width':1});
+  const r=34+chromaSat*146,mark=polar(210,210,r,chromaHue);
+  addSvg(chromaSvg,'circle',{cx:mark.x,cy:mark.y,r:9,class:'wheel-marker'});
+  addSvg(chromaSvg,'circle',{cx:mark.x,cy:mark.y,r:3,fill:'#fff'});
+  const color=hslHex(chromaHue,chromaSat,chromaValue/100);
+  chromaPicker.value=color; $id('chromaValue').textContent=color;
+  const bandName=chromaSat<.3?'niska':chromaSat<.58?'średnia':'wysoka';
+  $id('chromaReadout').innerHTML=`<b>${hueNames[Math.round(chromaHue/30)%12]}</b> · chroma ${bandName} (${Math.round(chromaSat*100)}%) · walor ${chromaValue}%.<br>Im bliżej środka, tym bardziej neutralny kolor. Pierścień zewnętrzny pokazuje mocniejszą chromę.`;
+ }
+ function selectChromaAt(e){
+  const rect=chromaSvg.getBoundingClientRect(),x=(e.clientX-rect.left)/rect.width*420-210,y=(e.clientY-rect.top)/rect.height*420-210;
+  const r=Math.sqrt(x*x+y*y),angle=(Math.atan2(x,-y)*180/Math.PI+360)%360;
+  if(r<28)return;
+  chromaHue=angle;chromaSat=clamp((r-34)/146,0,1);renderChroma();
+ }
+ if(chromaSvg){chromaSvg.addEventListener('click',selectChromaAt);chromaPicker.addEventListener('input',()=>{[chromaHue,chromaSat]=hexHsl(chromaPicker.value);renderChroma()});chromaLight.addEventListener('input',()=>{chromaValue=+chromaLight.value;$id('chromaLightnessValue').textContent=chromaValue+'%';renderChroma()});renderChroma()}
+
+ // 2) Harmony wheel: choose base color by picker or clicking the circle; apply selected geometry.
+ const harmonySvg=$id('harmonyWheel'),harmonyPicker=$id('harmonyPicker');
+ let harmonyMode='analog';
+ const harmonyAngles={analog:[-30,0,30],complementary:[0,180],split:[0,150,210],triad:[0,120,240],tetrad:[0,90,180,270],mono:[0,0,0,0]};
+ const harmonyText={analog:'Barwy sąsiadujące — spokojna, spójna gama. Zmieniaj walor i chromę, aby uniknąć monotonii.',complementary:'Dwa odcienie leżą naprzeciw siebie. W malarstwie pigmentowym neutralizacja zależy od konkretnej pary farb.',split:'Kolor bazowy i dwa sąsiednie odcienie po przeciwnej stronie. Kontrast jest bardziej złożony niż w parze dopełniającej.',triad:'Trzy barwy rozłożone co około 120°. Wybierz jedną dominantę, pozostałe niech będą tonikiem i akcentem.',tetrad:'Dwie pary dopełniające. Ogranicz liczbę równorzędnych dominant, bo zestaw łatwo staje się zbyt konkurencyjny.',mono:'Jedna rodzina odcieni w różnych walorach i poziomach chromy.'};
+ function renderHarmony(){
+  if(!harmonySvg)return;
+  harmonySvg.innerHTML='';
+  for(let i=0;i<72;i++)addSvg(harmonySvg,'path',{d:annular(210,210,128,180,i*5,(i+1)*5),fill:hslHex(i*5,.78,.52),class:'wheel-segment'});
+  const base=harmonyPicker.value,[h,s,l]=hexHsl(base),angs=harmonyAngles[harmonyMode],dots=[];
+  const palette=angs.map((off,i)=>{
+   const hue=(h+off+360)%360;
+   if(harmonyMode==='mono')return hslHex(h,[Math.max(.16,s*.45),Math.max(.22,s*.72),s,Math.max(.18,s*.58)][i], [.3,.43,.58,.72][i]);
+   return hslHex(hue,clamp(s||.6,.35,.88),clamp(l+(i===0?0:(i%2?.08:-.07)),.22,.78));
+  });
+  angs.forEach((off,i)=>{
+   const point=polar(210,210,150,h+off);dots.push(point);
+   addSvg(harmonySvg,'circle',{cx:point.x,cy:point.y,r:9,fill:palette[i],stroke:'#29251f','stroke-width':2});
+  });
+  if(dots.length>1){
+   const coords=dots.map(p=>`${p.x},${p.y}`).join(' ');
+   if(harmonyMode==='triad'||harmonyMode==='tetrad'||harmonyMode==='split'||harmonyMode==='analog')addSvg(harmonySvg,'polygon',{points:coords,fill:'#ffffff1c',stroke:'#28251f','stroke-width':2});
+   else addSvg(harmonySvg,'line',{x1:dots[0].x,y1:dots[0].y,x2:dots[1].x,y2:dots[1].y,stroke:'#28251f','stroke-width':2});
+  }
+  addSvg(harmonySvg,'circle',{cx:210,cy:210,r:54,fill:base,stroke:'#29251f','stroke-width':2});
+  $id('harmonyValue').textContent=base.toUpperCase();
+  $id('harmonySwatches').innerHTML=palette.map((c,i)=>`<div class="swatch"><div class="chip" style="background:${c}"></div><b>${['Baza','Tonik','Akcent','Dodatkowy'][i]||'Odcień'}</b><small>${c}</small></div>`).join('');
+  $id('harmonyReadout').textContent=harmonyText[harmonyMode];
+ }
+ harmonyPicker?.addEventListener('input',renderHarmony);
+ harmonySvg?.addEventListener('click',e=>{
+  const rect=harmonySvg.getBoundingClientRect(),x=(e.clientX-rect.left)/rect.width*420-210,y=(e.clientY-rect.top)/rect.height*420-210;
+  const r=Math.sqrt(x*x+y*y);if(r<60)return;
+  const h=(Math.atan2(x,-y)*180/Math.PI+360)%360;
+  harmonyPicker.value=hslHex(h,.72,.5);renderHarmony();
+ });
+ $id('harmonyModes')?.addEventListener('click',e=>{
+  const b=e.target.closest('button[data-harmony]');if(!b)return;
+  harmonyMode=b.dataset.harmony;$id('harmonyModes').querySelectorAll('button').forEach(x=>x.classList.toggle('active',x===b));renderHarmony();
+ });
+ renderHarmony();
+
+ // 3) Pigment mixing wheel and a simple, explicit subtractive approximation.
+ const pigmentSvg=$id('pigmentWheel'),selA=$id('pigmentA'),selB=$id('pigmentB'),ratio=$id('pigmentRatio');
+ const paints=renesans;
+ const pigmentWheelNames=['Żółta średnia','Cynober','Magenta','Fiolet','Ultramaryna','Błękit ftalo','Turkusowy','Zieleń ftalo','Zieleń błyszcząca','Zieleń oliwna','Ugier żółty','Ziemia sieneńska palona'];
+ function pigmentByName(n){return paints.find(p=>p[0]===n)||paints[0]}
+ function fillPigmentSelects(){
+  [selA,selB].forEach((sel,idx)=>{
+   paints.forEach((p,i)=>{const op=document.createElement('option');op.value=String(i);op.textContent=p[0]+' · '+p[2];sel.appendChild(op)});
+   sel.value=String(idx===0?paints.findIndex(p=>p[0]==='Ultramaryna'):paints.findIndex(p=>p[0]==='Żółta pomarańczowa'));
+  });
+ }
+ function subtractiveMix(hexA,hexB,wa){
+  const a=hexA.slice(1).match(/.{2}/g).map(x=>parseInt(x,16)),b=hexB.slice(1).match(/.{2}/g).map(x=>parseInt(x,16));
+  const wb=1-wa;
+  // geometric reflectance blend as a simplified subtractive illustration, not a pigment spectral model
+  const out=a.map((v,i)=>Math.round(Math.pow(Math.max(1,v)/255,wa)*Math.pow(Math.max(1,b[i])/255,wb)*255));
+  return '#'+out.map(v=>v.toString(16).padStart(2,'0')).join('').toUpperCase();
+ }
+ function renderPigmentWheel(){
+  if(!pigmentSvg)return;
+  pigmentSvg.innerHTML='';
+  const selectedA=paints[+selA.value],selectedB=paints[+selB.value];
+  const activeNames=new Set([selectedA[0],selectedB[0]]);
+  pigmentWheelNames.forEach((name,i)=>{
+   const p=pigmentByName(name),angle=i*30;
+   const path=addSvg(pigmentSvg,'path',{d:annular(210,210,90,174,angle-14,angle+14),fill:p[1],stroke:activeNames.has(name)?'#171512':'#fffdfa','stroke-width':activeNames.has(name)?5:2,'data-name':name,class:'wheel-segment'});
+   const dot=polar(210,210,130,angle);
+   addSvg(pigmentSvg,'text',{x:dot.x,y:dot.y+4,class:'pigment-wheel-label','text-anchor':'middle'}).textContent=String(i+1);
+  });
+  addSvg(pigmentSvg,'circle',{cx:210,cy:210,r:67,fill:'#f9f6ee',stroke:'#bdb6aa','stroke-width':2});
+  addSvg(pigmentSvg,'text',{x:210,y:205,class:'pigment-wheel-label','font-size':15}).textContent='Pigmenty';
+  addSvg(pigmentSvg,'text',{x:210,y:224,class:'pigment-wheel-label'}).textContent='RYB / farby';
+  const legend=$id('pigmentLegend');
+  if(legend)legend.innerHTML=pigmentWheelNames.map((name,i)=>{const p=pigmentByName(name);return `<button type="button" data-name="${name}"><span style="background:${p[1]}"></span><span>${i+1}. ${p[0]}<small style="display:block;color:var(--muted)">${p[2]}</small></span></button>`}).join('');
+  const a=+ratio.value/100,b=1-a,mix=subtractiveMix(selectedA[1],selectedB[1],a);
+  $id('pigmentRatioValue').textContent=`${Math.round(a*100)}% / ${Math.round(b*100)}%`;
+  $id('pigmentChipA').style.background=selectedA[1];$id('pigmentChipB').style.background=selectedB[1];$id('pigmentMixChip').style.background=mix;
+  $id('pigmentNameA').textContent=selectedA[0];$id('pigmentNameB').textContent=selectedB[0];$id('pigmentMixHex').textContent=mix;
+  $id('pigmentMixNote').innerHTML=`Mieszanka orientacyjna: <b>${selectedA[0]}</b> (${Math.round(a*100)}%) + <b>${selectedB[0]}</b> (${Math.round(b*100)}%).<br>Indeksy pigmentów: ${selectedA[2]} + ${selectedB[2]}. Rzeczywista farba może dać inny wynik ze względu na pigment, krycie, koncentrację i podłoże.`;
+ }
+ fillPigmentSelects();
+ selA?.addEventListener('change',renderPigmentWheel);selB?.addEventListener('change',renderPigmentWheel);ratio?.addEventListener('input',renderPigmentWheel);
+ function chooseWheelPigment(name){
+  const idx=paints.findIndex(x=>x[0]===name);if(idx<0)return;
+  if(selA.dataset.justChosen!=='A'){selA.value=String(idx);selA.dataset.justChosen='A'}else{selB.value=String(idx);selA.dataset.justChosen='';}
+  renderPigmentWheel();
+ }
+ pigmentSvg?.addEventListener('click',e=>{const p=e.target.closest('[data-name]');if(p)chooseWheelPigment(p.dataset.name)});
+ $id('pigmentLegend')?.addEventListener('click',e=>{const p=e.target.closest('[data-name]');if(p)chooseWheelPigment(p.dataset.name)});
+ renderPigmentWheel();
+
+ // Skin tone studies: light, midtone, local colour, shadow, reflected light.
+ const skinSets=[
+  ['Jasna — chłodne światło','Światło, półtony i cień z różowym, chłodnym odbiciem',['#F5D8C9','#E8BFAE','#D79C8C','#9A665C','#C98E9B'],'W chłodnym świetle zachowaj subtelne różnice różu i beżu; nie sprowadzaj cienia do szarości.'],
+  ['Jasna — ciepłe światło','Ciepła złocista karnacja',['#F6DDBB','#EBC59C','#D9A47A','#9E694D','#C58B6C'],'Ciepłe światło może przesunąć światła ku żółci i brzoskwini; cień nie musi być pomarańczowy.'],
+  ['Średnia — oliwkowa','Oliwkowy półton i zgaszone cienie',['#E4C8A2','#CFA77D','#A9825C','#665344','#8E9270'],'Obserwuj zielonkawy lub szarawy wpływ otoczenia. Oliwkowość nie oznacza jednolitej zieleni w całej twarzy.'],
+  ['Średnia — złocista','Ciepła, złocistobrązowa gama',['#E8C49A','#C99567','#A66E47','#654332','#B77F5A'],'Buduj różnicę między światłem a półtonem; dodaj odbicia z otoczenia, zamiast mieszać jeden uniwersalny brąz.'],
+  ['Głęboka — ciepła','Głębokie brązy i ciepłe odbicia',['#B77D5B','#8F563C','#683C2E','#321F1B','#A76D42'],'Nie rozjaśniaj wszystkich świateł bielą. Sprawdzaj lokalną temperaturę i chromę w świetle.'],
+  ['Głęboka — chłodna','Ciemna gama z chłodniejszymi półtonami',['#A77B72','#79564F','#553B3D','#251F29','#6F5968'],'Cień może przechodzić w chłodne fiolety i granaty, jeśli uzasadnia to oświetlenie i odbicia.']
+ ];
+ const skinRoot=$id('skinToneGallery');
+ if(skinRoot)skinRoot.innerHTML=skinSets.map(s=>`<article class="skin-card"><h3>${s[0]}</h3><p>${s[1]}</p><div class="skin-strip">${s[2].map(c=>`<span title="${c}" style="background:${c}"></span>`).join('')}</div><div class="skin-legend"><span>Światło</span><span>Jasny półton</span><span>Kolor lokalny</span><span>Cień</span><span>Odbicie</span></div><p>${s[3]}</p></article>`).join('');
+
+ // Interactive quiz bank.
+ const questions=[
+  {q:'Który wymiar koloru opisuje jasność lub ciemność?',a:['Barwa','Walor','Chroma','Temperatura'],c:1,why:'Walor opisuje poziom jasności. Dwa kolory o różnej barwie mogą mieć podobny walor.'},
+  {q:'Co zwykle oznacza zmniejszanie chromy?',a:['Zwiększanie nasycenia','Przygaszanie koloru','Zmianę tylko temperatury','Dodanie zawsze bieli'],c:1,why:'Obniżenie chromy oznacza mniejszą intensywność. Można to osiągać różnymi mieszankami, nie tylko bielą.'},
+  {q:'Jak nazywamy barwy po przeciwnych stronach koła?',a:['Analogiczne','Monochromatyczne','Dopełniające','Triadyczne'],c:2,why:'Barwy dopełniające leżą naprzeciw siebie w wybranym modelu koła. W pigmentach efekt zależy od farb.'},
+  {q:'W układzie dominanta–tonik–akcent, który element powinien być używany najbardziej oszczędnie?',a:['Dominanta','Tonik','Akcent','Grunt'],c:2,why:'Akcent ma niewielki udział, ale przyciąga uwagę dzięki położeniu, kontrastowi lub intensywności.'},
+  {q:'Co najbezpieczniej zrobić przed przygaszeniem bardzo nasyconej farby dopełnieniem?',a:['Dodać dużo dopełnienia od razu','Wykonać serię małych próbek','Dodać czerń bez próby','Rozcieńczyć wodą'],c:1,why:'Dodawaj pigment stopniowo. Silnie barwiąca farba może szybko zmienić mieszaninę.'},
+  {q:'Dlaczego cień nie musi być po prostu ciemniejszą wersją koloru lokalnego?',a:['Bo nie ma waloru','Bo odbija światło otoczenia i może zmieniać temperaturę','Bo zawsze jest czarny','Bo powinien mieć wyższą chromę'],c:1,why:'Cień obejmuje wpływ światła otoczenia, odbić i materiału. Zmienia się zarówno walor, jak i temperatura.'}
+ ];
+ let qIndex=0,score=0,answered=0,locked=false;
+ function showQuestion(){
+  const q=questions[qIndex];locked=false;
+  $id('exerciseProgress').textContent=`Zadanie ${qIndex+1} z ${questions.length}`;
+  $id('exerciseScore').textContent=`Wynik: ${score} / ${answered}`;
+  $id('exerciseQuestion').textContent=q.q;
+  $id('exerciseAnswers').innerHTML=q.a.map((a,i)=>`<button class="exercise-answer" type="button" data-answer="${i}">${a}</button>`).join('');
+  $id('exerciseFeedback').textContent='Wybierz jedną odpowiedź.';
+  $id('exerciseNext').disabled=true;
+  $id('exerciseNext').textContent=qIndex===questions.length-1?'Zobacz wynik':'Następne zadanie';
+ }
+ $id('exerciseAnswers')?.addEventListener('click',e=>{
+  const b=e.target.closest('[data-answer]');if(!b||locked)return;locked=true;
+  const q=questions[qIndex],ans=+b.dataset.answer;answered++;
+  if(ans===q.c)score++;
+  $id('exerciseAnswers').querySelectorAll('button').forEach((btn,i)=>{btn.disabled=true;if(i===q.c)btn.classList.add('correct');else if(i===ans)btn.classList.add('incorrect')});
+  $id('exerciseScore').textContent=`Wynik: ${score} / ${answered}`;
+  $id('exerciseFeedback').innerHTML=`<b>${ans===q.c?'Dobrze!':'Tym razem nie.'}</b> ${q.why}`;
+  $id('exerciseNext').disabled=false;
+ });
+ $id('exerciseNext')?.addEventListener('click',()=>{
+  if(qIndex<questions.length-1){qIndex++;showQuestion()}
+  else{$id('exerciseQuestion').textContent=`Koniec ćwiczenia: ${score} na ${questions.length} poprawnych odpowiedzi.`;$id('exerciseAnswers').innerHTML='';$id('exerciseFeedback').textContent='Wróć do Warsztatu Koloru i utrwal tematy, które sprawiły trudność.';$id('exerciseNext').disabled=true;}
+ });
+ $id('exerciseRestart')?.addEventListener('click',()=>{qIndex=0;score=0;answered=0;showQuestion()});
+ showQuestion();
+
+ // A'Kryl colour catalogue using the pigment records already used by the colour matching module.
+ const catalogue=$id('renesansGallery'),search=$id('renesansSearch'),group=$id('renesansGroup');
+ const categoryOf=p=>{
+  const n=p[0].toLowerCase();
+  if(/żółt|ugier/.test(n))return 'yellow';
+  if(/czerw|karmin|magenta|bordow|cielist/.test(n))return 'red';
+  if(/błękit|ultramaryna|fiolet|granat|turkus/.test(n))return 'blue';
+  if(/zieleń/.test(n))return 'green';
+  if(/ziemia|umbra|van dycka|brunatna/.test(n))return 'earth';
+  return 'neutral';
+ };
+ function renderCatalogue(){
+  const q=(search.value||'').toLocaleLowerCase('pl'),cat=group.value;
+  const items=paints.filter(p=>(cat==='all'||categoryOf(p)===cat)&&p.join(' ').toLocaleLowerCase('pl').includes(q));
+  $id('renesansCount').textContent=`Wyświetlono ${items.length} z ${paints.length} farb`;
+  catalogue.innerHTML=items.map(p=>`<button class="renesans-card" type="button" data-paint="${paints.indexOf(p)}"><span class="renesans-chip" style="background:${p[1]}"></span><span><b>${p[0]}</b><small>${p[2]} · ${p[1]}</small></span></button>`).join('');
+ }
+ catalogue?.addEventListener('click',e=>{
+  const b=e.target.closest('[data-paint]');if(!b)return;
+  const p=paints[+b.dataset.paint];if(!p)return;
+  selA.value=String(paints.indexOf(p));renderPigmentWheel();
+  $id('renesansSelected').textContent=`Wybrano ${p[0]} (${p[2]}). Ustawiono ją jako pigment A w mieszalniku. Próbka HEX ${p[1]} jest orientacyjna.`;
+ });
+ search?.addEventListener('input',renderCatalogue);group?.addEventListener('change',renderCatalogue);renderCatalogue();
+})();
+</script>
+
+
+<script>
+(function(){
+ const tabs=[...document.querySelectorAll('[data-workshop-tab]')];
+ const panes=[...document.querySelectorAll('[data-workshop-pane]')];
+ function selectWorkshopTab(name){
+  tabs.forEach(b=>{const on=b.dataset.workshopTab===name;b.classList.toggle('active',on);b.setAttribute('aria-selected',on?'true':'false')});
+  panes.forEach(p=>p.classList.toggle('active',p.dataset.workshopPane===name));
+ }
+ tabs.forEach(b=>b.addEventListener('click',()=>selectWorkshopTab(b.dataset.workshopTab)));
+ if(tabs.length)selectWorkshopTab('basics');
+
+ const entries=[{"src":"kompozycje-mini/zasady_001.jpg","title":"Promieniowanie","category":"Klasyczne zasady","description":"Linie promieniście zbiegają się ku jednemu punktowi. W pejzażu mogą to być tory, ścieżki, brzegi lub kierunki gałęzi."},{"src":"kompozycje-mini/zasady_002.jpg","title":"Tunel / prowadzenie w głąb","category":"Klasyczne zasady","description":"Powtarzające się ramy zmniejszają się w głąb kadru. Zostaw w centrum czytelny motyw, do którego prowadzi spojrzenie."},{"src":"kompozycje-mini/zasady_003.jpg","title":"Złoty trójkąt","category":"Klasyczne zasady","description":"Przekątne dzielą kadr na trójkątne pola. Pomagają budować dynamikę, ale nie muszą być widoczne jako dosłowne linie."},{"src":"kompozycje-mini/zasady_004.jpg","title":"Kompozycja kolista","category":"Klasyczne zasady","description":"Okrągły lub owalny rytm prowadzi oko wokół motywu. Nie zamykaj go zbyt szczelnie, jeśli scena ma pozostać otwarta."},{"src":"kompozycje-mini/zasady_005.jpg","title":"Złoty podział","category":"Klasyczne zasady","description":"Przesuń dominantę z centrum i sprawdź nierówne proporcje pól. Zasada jest wskazówką, a nie obowiązkowym szablonem."},{"src":"kompozycje-mini/zasady_006.jpg","title":"Kompozycja krzyżowa","category":"Klasyczne zasady","description":"Pion i poziom stabilizują układ. Punkt przecięcia może stać się dominantą, ale centralna symetria często daje bardziej statyczny efekt."},{"src":"kompozycje-mini/klasyka_007.jpg","title":"Piramida / trójkąt","category":"Klasyczne zasady","description":"Trójkąt porządkuje grupę elementów i daje stabilną podstawę."},{"src":"kompozycje-mini/klasyka_008.jpg","title":"Pejzaż z dominantą","category":"Klasyczne zasady","description":"Duża masa i mniejszy akcent budują asymetryczną równowagę."},{"src":"kompozycje-mini/klasyka_009.jpg","title":"Równowaga dwóch mas","category":"Klasyczne zasady","description":"Dwie grupy rozkładają ciężar po bokach, lecz nie muszą być identyczne."},{"src":"kompozycje-mini/klasyka_010.jpg","title":"Krzyż / osie","category":"Klasyczne zasady","description":"Przecięcie osi tworzy mocny szkielet obrazu. Zmieniaj położenie punktu przecięcia."},{"src":"kompozycje-mini/klasyka_011.jpg","title":"Pionowe rytmy","category":"Klasyczne zasady","description":"Piony drzew lub architektury tworzą rytm i mogą być zrównoważone linią horyzontu."},{"src":"kompozycje-mini/klasyka_012.jpg","title":"Otwarta perspektywa","category":"Klasyczne zasady","description":"Puste pole i kilka planów otwierają głębię bez nadmiaru detali."},{"src":"kompozycje-mini/klasyka_013.jpg","title":"Promieniowanie","category":"Klasyczne zasady","description":"Linie zbiegające się przyciągają wzrok do punktu skupienia."},{"src":"kompozycje-mini/klasyka_014.jpg","title":"Krzywa prowadząca","category":"Klasyczne zasady","description":"Krzywa brzegu lub ścieżki prowadzi spojrzenie w głąb sceny."},{"src":"kompozycje-mini/klasyka_015.jpg","title":"Droga w głąb","category":"Klasyczne zasady","description":"Droga lub strumień mogą tworzyć kierunek, ale nie powinny wyprowadzać wzroku poza kadr."},{"src":"kompozycje-mini/klasyka_016.jpg","title":"Układ L","category":"Klasyczne zasady","description":"Pion i poziom tworzą narożnik, który może stabilizować dominantę."},{"src":"kompozycje-mini/klasyka_017.jpg","title":"Wysoka forma przy krawędzi","category":"Klasyczne zasady","description":"Silny pion przy krawędzi kadru równoważy rozległe spokojne pole."},{"src":"kompozycje-mini/klasyka_018.jpg","title":"Rama naturalna","category":"Klasyczne zasady","description":"Drzewa lub architektura zamykają kadr i kierują uwagę do środka."},{"src":"kompozycje-mini/klasyka_019.jpg","title":"Góra jako dominanta","category":"Klasyczne zasady","description":"Szczyt lub wzgórze tworzy wyraźny punkt skupienia."},{"src":"kompozycje-mini/klasyka_020.jpg","title":"Pion i poziom","category":"Klasyczne zasady","description":"Horyzont i pionowy element organizują prosty pejzaż."},{"src":"kompozycje-mini/klasyka_021.jpg","title":"Linia promieniująca","category":"Klasyczne zasady","description":"Promieniste kierunki budują ruch wokół wybranego motywu."},{"src":"kompozycje-mini/payne_022.jpg","title":"Waga / Steelyard — schemat","category":"Kompozycje pejzażowe","description":"Niewielki akcent równoważy dużą, ciężką plamę po przeciwnej stronie."},{"src":"kompozycje-mini/payne_023.jpg","title":"Waga — wariant pejzażowy","category":"Kompozycje pejzażowe","description":"Masa drzewa lub skały może równoważyć mały motyw w oddali."},{"src":"kompozycje-mini/payne_024.jpg","title":"Mocna masa przy krawędzi","category":"Kompozycje pejzażowe","description":"Silna plama przy krawędzi wymaga przeciwwagi w środku albo po przeciwnej stronie."},{"src":"kompozycje-mini/payne_025.jpg","title":"Piramida / trójkąt","category":"Kompozycje pejzażowe","description":"Trójkątna struktura stabilizuje grupę elementów."},{"src":"kompozycje-mini/payne_026.jpg","title":"Piramida — pejzaż","category":"Kompozycje pejzażowe","description":"Różne wielkości form budują piramidalny układ."},{"src":"kompozycje-mini/payne_027.jpg","title":"Poziomy balans","category":"Kompozycje pejzażowe","description":"Horyzont i dwie masy tworzą spokojną równowagę."},{"src":"kompozycje-mini/payne_028.jpg","title":"Waga szalkowa — schemat","category":"Kompozycje pejzażowe","description":"Równowaga nie oznacza identycznych wielkości; liczy się wizualny ciężar."},{"src":"kompozycje-mini/payne_029.jpg","title":"Asymetryczne wzgórza","category":"Kompozycje pejzażowe","description":"Wzgórze i ciemna roślinność tworzą nierówne, ale zrównoważone pola."},{"src":"kompozycje-mini/payne_030.jpg","title":"Równowaga brył","category":"Kompozycje pejzażowe","description":"Zwróć uwagę na ciężar dużych brył i rozkład pustej przestrzeni."},{"src":"kompozycje-mini/payne_031.jpg","title":"Krzyż — schemat","category":"Kompozycje pejzażowe","description":"Krzyż porządkuje obraz na cztery pola. Unikaj automatycznego centrowania dominanty."},{"src":"kompozycje-mini/payne_032.jpg","title":"Piony w pejzażu","category":"Kompozycje pejzażowe","description":"Pionowe maszty lub drzewa mogą prowadzić wzrok wzdłuż horyzontu."},{"src":"kompozycje-mini/payne_033.jpg","title":"Rytm pionów","category":"Kompozycje pejzażowe","description":"Powtarzalne piony tworzą rytm; odmieniaj ich wysokości i odstępy."},{"src":"kompozycje-mini/payne_034.jpg","title":"Okrąg / Circular — schemat","category":"Kompozycje pejzażowe","description":"Okrągła forma może skupiać wzrok lub porządkować przestrzeń wokół motywu."},{"src":"kompozycje-mini/payne_035.jpg","title":"Otwarta dolina","category":"Kompozycje pejzażowe","description":"Duże jasne pole doliny daje oddech i równoważy masy przy krawędziach."},{"src":"kompozycje-mini/payne_036.jpg","title":"Chmury jako masa","category":"Kompozycje pejzażowe","description":"Chmury tworzą duże plamy o nieregularnym rytmie."},{"src":"kompozycje-mini/payne_037.jpg","title":"Promieniowanie — schemat","category":"Kompozycje pejzażowe","description":"Promieniste linie zbiegają się ku punktowi skupienia."},{"src":"kompozycje-mini/payne_038.jpg","title":"Ścieżka promienista","category":"Kompozycje pejzażowe","description":"Ścieżka może kierować wzrok do dominanty w głębi."},{"src":"kompozycje-mini/payne_039.jpg","title":"Droga w głąb","category":"Kompozycje pejzażowe","description":"Droga i linia terenu budują perspektywę."},{"src":"kompozycje-mini/payne_040.jpg","title":"Krzywa S — schemat","category":"Kompozycje pejzażowe","description":"Krzywa S miękko prowadzi oko przez kompozycję."},{"src":"kompozycje-mini/payne_041.jpg","title":"S-curve w pejzażu","category":"Kompozycje pejzażowe","description":"Zakręt brzegu tworzy płynny rytm i łączy plany."},{"src":"kompozycje-mini/payne_042.jpg","title":"Prowadzenie zakrętem","category":"Kompozycje pejzażowe","description":"Powtarzaj zakręty w różnych skalach, by prowadzenie nie było monotonne."},{"src":"kompozycje-mini/payne_043.jpg","title":"Układ L — schemat","category":"Kompozycje pejzażowe","description":"Układ L stabilizuje dolną i boczną część kadru."},{"src":"kompozycje-mini/payne_044.jpg","title":"Forma przy krawędzi","category":"Kompozycje pejzażowe","description":"Pionowa masa przy brzegu może otwierać przestrzeń w środku."},{"src":"kompozycje-mini/payne_045.jpg","title":"Rama pionowa","category":"Kompozycje pejzażowe","description":"Rama z drzew lub skał kieruje spojrzenie do wnętrza obrazu."},{"src":"kompozycje-mini/payne_046.jpg","title":"Asymetria z dominantą","category":"Kompozycje pejzażowe","description":"Duża i mała plama tworzą asymetryczną równowagę."},{"src":"kompozycje-mini/payne_047.jpg","title":"Grupowanie form","category":"Kompozycje pejzażowe","description":"Skupienie kilku małych form może równoważyć większy obiekt."},{"src":"kompozycje-mini/payne_048.jpg","title":"Grupa drzew","category":"Kompozycje pejzażowe","description":"Grupa drzew tworzy jedną masę, jeśli ich kontury zlewają się w większy kształt."},{"src":"kompozycje-mini/payne_049.jpg","title":"Złoty trójkąt — pejzaż","category":"Kompozycje pejzażowe","description":"Trójkątne kierunki wzmacniają ruch w pejzażu."},{"src":"kompozycje-mini/payne_050.jpg","title":"Pionowa dominanta","category":"Kompozycje pejzażowe","description":"Pionowy obiekt przy krawędzi może być dominantą lub ramą."},{"src":"kompozycje-mini/payne_051.jpg","title":"Linie promieniujące","category":"Kompozycje pejzażowe","description":"Kierunki promieniście zbiegające się do centrum wzmacniają punkt skupienia."},{"src":"kompozycje-mini/payne_book_052.jpg","title":"Waga / Steelyard — plansza","category":"Klasyczne zasady","description":"Schemat wagi pokazuje, że mały element może równoważyć dużą masę dzięki położeniu."},{"src":"kompozycje-mini/payne_book_053.jpg","title":"Waga — pionowa dominanta","category":"Klasyczne zasady","description":"Wysoki pion na brzegu równoważy rozległe pole nieba i ziemi."},{"src":"kompozycje-mini/payne_book_054.jpg","title":"Waga — balans mas","category":"Klasyczne zasady","description":"Skupisko drzew działa jak jedna masa, którą równoważy spokojna przestrzeń."},{"src":"kompozycje-mini/payne_book_055.jpg","title":"Równowaga szalkowa","category":"Klasyczne zasady","description":"Symetryczna waga jest punktem wyjścia; w obrazie można ją rozluźnić."},{"src":"kompozycje-mini/payne_book_056.jpg","title":"Wzgórze jako masa","category":"Klasyczne zasady","description":"Wzgórza i roślinność budują kilka planów o różnym ciężarze."},{"src":"kompozycje-mini/payne_book_057.jpg","title":"Duże jasne pole","category":"Klasyczne zasady","description":"Jasna przestrzeń może być główną formą kompozycyjną."},{"src":"kompozycje-mini/payne_book_058.jpg","title":"Okrąg / Circular — schemat","category":"Klasyczne zasady","description":"Zamknięty obrys porządkuje obraz wokół centralnej formy."},{"src":"kompozycje-mini/payne_book_059.jpg","title":"Pejzaż otwarty","category":"Klasyczne zasady","description":"Otwarte pola prowadzą wzrok w dal i nadają pejzażowi oddech."},{"src":"kompozycje-mini/payne_book_060.jpg","title":"Chmury i horyzont","category":"Klasyczne zasady","description":"Chmury tworzą masę, która odpowiada ciemniejszej linii ziemi."},{"src":"kompozycje-mini/payne_book_061.jpg","title":"Krzywa S — schemat","category":"Klasyczne zasady","description":"Krzywa S prowadzi spojrzenie przez kolejne plany."},{"src":"kompozycje-mini/payne_book_062.jpg","title":"Rzeka jako krzywa","category":"Klasyczne zasady","description":"Rzeka tworzy miękką linię prowadzącą, a jej brzegi porządkują rytm."},{"src":"kompozycje-mini/payne_book_063.jpg","title":"Ścieżka prowadząca","category":"Klasyczne zasady","description":"Ścieżka może łączyć pierwszy plan z odległą dominantą."},{"src":"kompozycje-mini/payne_book_064.jpg","title":"Pionowa dominanta","category":"Klasyczne zasady","description":"Pionowa forma blisko krawędzi daje ciężar i skalę."},{"src":"kompozycje-mini/payne_book_065.jpg","title":"O — układ otwarty","category":"Klasyczne zasady","description":"Otwarty okrągły układ sugeruje ruch spojrzenia wokół głównego pola."},{"src":"kompozycje-mini/payne_book_066.jpg","title":"Rama / S-curve","category":"Klasyczne zasady","description":"Rama z drzew lub form po bokach może prowadzić do centrum."},{"src":"kompozycje-mini/landscape_131.jpg","title":"Pejzaż — miniatura kompozycyjna 01","category":"Kompozycje pejzażowe","description":"Zestaw poziome pasy i nierówny horyzont. Mały obiekt w pierwszym planie daje skalę."},{"src":"kompozycje-mini/landscape_132.jpg","title":"Pejzaż — miniatura kompozycyjna 02","category":"Kompozycje pejzażowe","description":"Ścieżka lub rzeka prowadzi wzrok ku środkowemu planowi. Zostaw czytelną dominantę."},{"src":"kompozycje-mini/landscape_133.jpg","title":"Pejzaż — miniatura kompozycyjna 03","category":"Kompozycje pejzażowe","description":"Grupy skał lub drzew budują ciężar po jednej stronie. Równoważ je pustą przestrzenią."},{"src":"kompozycje-mini/landscape_134.jpg","title":"Pejzaż — miniatura kompozycyjna 04","category":"Kompozycje pejzażowe","description":"Zastosuj zbieżne kierunki, ale nie prowadź wszystkich linii do tego samego punktu."},{"src":"kompozycje-mini/landscape_135.jpg","title":"Pejzaż — miniatura kompozycyjna 05","category":"Kompozycje pejzażowe","description":"Ścieżka lub rzeka prowadzi wzrok ku środkowemu planowi. Zostaw czytelną dominantę."},{"src":"kompozycje-mini/landscape_136.jpg","title":"Pejzaż — miniatura kompozycyjna 06","category":"Kompozycje pejzażowe","description":"Grupy skał lub drzew budują ciężar po jednej stronie. Równoważ je pustą przestrzenią."},{"src":"kompozycje-mini/landscape_137.jpg","title":"Pejzaż — miniatura kompozycyjna 07","category":"Kompozycje pejzażowe","description":"Zastosuj zbieżne kierunki, ale nie prowadź wszystkich linii do tego samego punktu."},{"src":"kompozycje-mini/landscape_138.jpg","title":"Pejzaż — miniatura kompozycyjna 08","category":"Kompozycje pejzażowe","description":"Zestaw poziome pasy i nierówny horyzont. Mały obiekt w pierwszym planie daje skalę."},{"src":"kompozycje-mini/landscape_139.jpg","title":"Pejzaż — miniatura kompozycyjna 09","category":"Kompozycje pejzażowe","description":"Grupy skał lub drzew budują ciężar po jednej stronie. Równoważ je pustą przestrzenią."},{"src":"kompozycje-mini/landscape_140.jpg","title":"Pejzaż — miniatura kompozycyjna 10","category":"Kompozycje pejzażowe","description":"Zastosuj zbieżne kierunki, ale nie prowadź wszystkich linii do tego samego punktu."},{"src":"kompozycje-mini/landscape_141.jpg","title":"Pejzaż — miniatura kompozycyjna 11","category":"Kompozycje pejzażowe","description":"Zestaw poziome pasy i nierówny horyzont. Mały obiekt w pierwszym planie daje skalę."},{"src":"kompozycje-mini/landscape_142.jpg","title":"Pejzaż — miniatura kompozycyjna 12","category":"Kompozycje pejzażowe","description":"Ścieżka lub rzeka prowadzi wzrok ku środkowemu planowi. Zostaw czytelną dominantę."},{"src":"kompozycje-mini/landscape_143.jpg","title":"Pejzaż — miniatura kompozycyjna 13","category":"Kompozycje pejzażowe","description":"Zastosuj zbieżne kierunki, ale nie prowadź wszystkich linii do tego samego punktu."},{"src":"kompozycje-mini/landscape_144.jpg","title":"Pejzaż — miniatura kompozycyjna 14","category":"Kompozycje pejzażowe","description":"Zestaw poziome pasy i nierówny horyzont. Mały obiekt w pierwszym planie daje skalę."},{"src":"kompozycje-mini/landscape_145.jpg","title":"Pejzaż — miniatura kompozycyjna 15","category":"Kompozycje pejzażowe","description":"Ścieżka lub rzeka prowadzi wzrok ku środkowemu planowi. Zostaw czytelną dominantę."},{"src":"kompozycje-mini/landscape_146.jpg","title":"Pejzaż — miniatura kompozycyjna 16","category":"Kompozycje pejzażowe","description":"Grupy skał lub drzew budują ciężar po jednej stronie. Równoważ je pustą przestrzenią."},{"src":"kompozycje-mini/landscape_pencil_147.jpg","title":"Pejzaż — kompozycja 01","category":"Kompozycje pejzażowe","description":"Zwróć uwagę na podział horyzontu, rozkład dużych plam i kierunek, który prowadzi wzrok w głąb sceny."},{"src":"kompozycje-mini/landscape_pencil_148.jpg","title":"Pejzaż — kompozycja 02","category":"Kompozycje pejzażowe","description":"Zwróć uwagę na podział horyzontu, rozkład dużych plam i kierunek, który prowadzi wzrok w głąb sceny."},{"src":"kompozycje-mini/landscape_pencil_149.jpg","title":"Pejzaż — kompozycja 03","category":"Kompozycje pejzażowe","description":"Zwróć uwagę na podział horyzontu, rozkład dużych plam i kierunek, który prowadzi wzrok w głąb sceny."},{"src":"kompozycje-mini/landscape_pencil_150.jpg","title":"Pejzaż — kompozycja 04","category":"Kompozycje pejzażowe","description":"Zwróć uwagę na podział horyzontu, rozkład dużych plam i kierunek, który prowadzi wzrok w głąb sceny."},{"src":"kompozycje-mini/landscape_pencil_151.jpg","title":"Pejzaż — kompozycja 05","category":"Kompozycje pejzażowe","description":"Zwróć uwagę na podział horyzontu, rozkład dużych plam i kierunek, który prowadzi wzrok w głąb sceny."},{"src":"kompozycje-mini/landscape_pencil_152.jpg","title":"Pejzaż — kompozycja 06","category":"Kompozycje pejzażowe","description":"Zwróć uwagę na podział horyzontu, rozkład dużych plam i kierunek, który prowadzi wzrok w głąb sceny."},{"src":"kompozycje-mini/landscape_pencil_153.jpg","title":"Pejzaż — kompozycja 07","category":"Kompozycje pejzażowe","description":"Zwróć uwagę na podział horyzontu, rozkład dużych plam i kierunek, który prowadzi wzrok w głąb sceny."},{"src":"kompozycje-mini/landscape_pencil_154.jpg","title":"Pejzaż — kompozycja 08","category":"Kompozycje pejzażowe","description":"Zwróć uwagę na podział horyzontu, rozkład dużych plam i kierunek, który prowadzi wzrok w głąb sceny."},{"src":"kompozycje-mini/landscape_pencil_155.jpg","title":"Pejzaż — kompozycja 09","category":"Kompozycje pejzażowe","description":"Zwróć uwagę na podział horyzontu, rozkład dużych plam i kierunek, który prowadzi wzrok w głąb sceny."},{"src":"kompozycje-mini/landscape_pencil_156.jpg","title":"Pejzaż — kompozycja 10","category":"Kompozycje pejzażowe","description":"Zwróć uwagę na podział horyzontu, rozkład dużych plam i kierunek, który prowadzi wzrok w głąb sceny."},{"src":"kompozycje-mini/landscape_pencil_157.jpg","title":"Pejzaż — kompozycja 11","category":"Kompozycje pejzażowe","description":"Zwróć uwagę na podział horyzontu, rozkład dużych plam i kierunek, który prowadzi wzrok w głąb sceny."},{"src":"kompozycje-mini/landscape_pencil_158.jpg","title":"Pejzaż — kompozycja 12","category":"Kompozycje pejzażowe","description":"Zwróć uwagę na podział horyzontu, rozkład dużych plam i kierunek, który prowadzi wzrok w głąb sceny."},{"src":"kompozycje-mini/landscape_pencil_159.jpg","title":"Pejzaż — kompozycja 13","category":"Kompozycje pejzażowe","description":"Zwróć uwagę na podział horyzontu, rozkład dużych plam i kierunek, który prowadzi wzrok w głąb sceny."},{"src":"kompozycje-mini/landscape_pencil_160.jpg","title":"Pejzaż — kompozycja 14","category":"Kompozycje pejzażowe","description":"Zwróć uwagę na podział horyzontu, rozkład dużych plam i kierunek, który prowadzi wzrok w głąb sceny."},{"src":"kompozycje-mini/landscape_pencil_161.jpg","title":"Pejzaż — kompozycja 15","category":"Kompozycje pejzażowe","description":"Zwróć uwagę na podział horyzontu, rozkład dużych plam i kierunek, który prowadzi wzrok w głąb sceny."},{"src":"kompozycje-mini/landscape_pencil_162.jpg","title":"Pejzaż — kompozycja 16","category":"Kompozycje pejzażowe","description":"Zwróć uwagę na podział horyzontu, rozkład dużych plam i kierunek, który prowadzi wzrok w głąb sceny."},{"src":"kompozycje-mini/landscape_pencil_163.jpg","title":"Pejzaż — kompozycja 17","category":"Kompozycje pejzażowe","description":"Zwróć uwagę na podział horyzontu, rozkład dużych plam i kierunek, który prowadzi wzrok w głąb sceny."},{"src":"kompozycje-mini/landscape_pencil_164.jpg","title":"Pejzaż — kompozycja 18","category":"Kompozycje pejzażowe","description":"Zwróć uwagę na podział horyzontu, rozkład dużych plam i kierunek, który prowadzi wzrok w głąb sceny."},{"src":"kompozycje-mini/landscape_pencil_165.jpg","title":"Pejzaż — kompozycja 19","category":"Kompozycje pejzażowe","description":"Zwróć uwagę na podział horyzontu, rozkład dużych plam i kierunek, który prowadzi wzrok w głąb sceny."},{"src":"kompozycje-mini/landscape_pencil_166.jpg","title":"Pejzaż — kompozycja 20","category":"Kompozycje pejzażowe","description":"Zwróć uwagę na podział horyzontu, rozkład dużych plam i kierunek, który prowadzi wzrok w głąb sceny."},{"src":"kompozycje-mini/landscape_pencil_167.jpg","title":"Pejzaż — kompozycja 21","category":"Kompozycje pejzażowe","description":"Zwróć uwagę na podział horyzontu, rozkład dużych plam i kierunek, który prowadzi wzrok w głąb sceny."},{"src":"kompozycje-mini/landscape_pencil_168.jpg","title":"Pejzaż — kompozycja 22","category":"Kompozycje pejzażowe","description":"Zwróć uwagę na podział horyzontu, rozkład dużych plam i kierunek, który prowadzi wzrok w głąb sceny."},{"src":"kompozycje-mini/landscape_pencil_169.jpg","title":"Pejzaż — kompozycja 23","category":"Kompozycje pejzażowe","description":"Zwróć uwagę na podział horyzontu, rozkład dużych plam i kierunek, który prowadzi wzrok w głąb sceny."},{"src":"kompozycje-mini/landscape_pencil_170.jpg","title":"Pejzaż — kompozycja 24","category":"Kompozycje pejzażowe","description":"Zwróć uwagę na podział horyzontu, rozkład dużych plam i kierunek, który prowadzi wzrok w głąb sceny."},{"src":"kompozycje-mini/landscape_pencil_171.jpg","title":"Pejzaż — kompozycja 25","category":"Kompozycje pejzażowe","description":"Zwróć uwagę na podział horyzontu, rozkład dużych plam i kierunek, który prowadzi wzrok w głąb sceny."},{"src":"kompozycje-mini/geom_fix_108.jpg","title":"Studium geometryczne 01","category":"Geometria i podziały","description":"Mały szkic pokazuje podział formatu na kilka płaszczyzn. Najpierw sprawdź ogólną równowagę, dopiero potem dodawaj temat."},{"src":"kompozycje-mini/geom_fix_109.jpg","title":"Studium geometryczne 02","category":"Geometria i podziały","description":"Zwróć uwagę na proporcje pustych pól oraz relację między liniami poziomymi i ukośnymi."},{"src":"kompozycje-mini/geom_fix_110.jpg","title":"Studium geometryczne 03","category":"Geometria i podziały","description":"Jedna dominująca przekątna może prowadzić wzrok; pozostałe linie powinny ją wspierać."},{"src":"kompozycje-mini/geom_fix_111.jpg","title":"Studium geometryczne 04","category":"Geometria i podziały","description":"Przecięcia linii tworzą węzły kompozycyjne. Sprawdź, czy nie konkurują z głównym motywem."},{"src":"kompozycje-mini/geom_fix_112.jpg","title":"Studium geometryczne 05","category":"Geometria i podziały","description":"Mały szkic pokazuje podział formatu na kilka płaszczyzn. Najpierw sprawdź ogólną równowagę, dopiero potem dodawaj temat."},{"src":"kompozycje-mini/geom_fix_113.jpg","title":"Studium geometryczne 06","category":"Geometria i podziały","description":"Zwróć uwagę na proporcje pustych pól oraz relację między liniami poziomymi i ukośnymi."},{"src":"kompozycje-mini/geom_fix_114.jpg","title":"Studium geometryczne 07","category":"Geometria i podziały","description":"Jedna dominująca przekątna może prowadzić wzrok; pozostałe linie powinny ją wspierać."},{"src":"kompozycje-mini/geom_fix_115.jpg","title":"Studium geometryczne 08","category":"Geometria i podziały","description":"Przecięcia linii tworzą węzły kompozycyjne. Sprawdź, czy nie konkurują z głównym motywem."},{"src":"kompozycje-mini/line_fix_116.jpg","title":"Krzywa S — schemat","category":"Linie prowadzące","description":"Zaplanuj przebieg linii zanim dodasz szczegóły. Sprawdź, jak zakręt i kierunek zmieniają ruch spojrzenia."},{"src":"kompozycje-mini/line_fix_117.jpg","title":"Linia S — postać i gest","category":"Linie prowadzące","description":"Linia kompozycyjna porządkuje gest, sylwetkę i otoczenie. Ważne, aby wzmacniała temat, a nie przecinała go przypadkowo."},{"src":"kompozycje-mini/line_fix_118.jpg","title":"Krzywa prowadząca — schemat","category":"Linie prowadzące","description":"Zaplanuj przebieg linii zanim dodasz szczegóły. Sprawdź, jak zakręt i kierunek zmieniają ruch spojrzenia."},{"src":"kompozycje-mini/line_fix_119.jpg","title":"Linia i scena plenerowa","category":"Linie prowadzące","description":"Linia kompozycyjna porządkuje gest, sylwetkę i otoczenie. Ważne, aby wzmacniała temat, a nie przecinała go przypadkowo."},{"src":"kompozycje-mini/line_fix_120.jpg","title":"Falująca linia — schemat","category":"Linie prowadzące","description":"Zaplanuj przebieg linii zanim dodasz szczegóły. Sprawdź, jak zakręt i kierunek zmieniają ruch spojrzenia."},{"src":"kompozycje-mini/line_fix_121.jpg","title":"Linia w scenie postaci","category":"Linie prowadzące","description":"Linia kompozycyjna porządkuje gest, sylwetkę i otoczenie. Ważne, aby wzmacniała temat, a nie przecinała go przypadkowo."},{"src":"kompozycje-mini/line_fix_122.jpg","title":"Łuk prowadzący — schemat","category":"Linie prowadzące","description":"Zaplanuj przebieg linii zanim dodasz szczegóły. Sprawdź, jak zakręt i kierunek zmieniają ruch spojrzenia."},{"src":"kompozycje-mini/line_fix_123.jpg","title":"Linia w scenie figuralnej","category":"Linie prowadzące","description":"Linia kompozycyjna porządkuje gest, sylwetkę i otoczenie. Ważne, aby wzmacniała temat, a nie przecinała go przypadkowo."},{"src":"kompozycje-mini/line_fix_124.jpg","title":"Podwójna krzywa — schemat","category":"Linie prowadzące","description":"Zaplanuj przebieg linii zanim dodasz szczegóły. Sprawdź, jak zakręt i kierunek zmieniają ruch spojrzenia."},{"src":"kompozycje-mini/line_fix_125.jpg","title":"Linia wśród drzew","category":"Linie prowadzące","description":"Linia kompozycyjna porządkuje gest, sylwetkę i otoczenie. Ważne, aby wzmacniała temat, a nie przecinała go przypadkowo."},{"src":"kompozycje-mini/line_fix_126.jpg","title":"Rytm krzywych — schemat","category":"Linie prowadzące","description":"Zaplanuj przebieg linii zanim dodasz szczegóły. Sprawdź, jak zakręt i kierunek zmieniają ruch spojrzenia."},{"src":"kompozycje-mini/line_fix_127.jpg","title":"Sylwetka na linii ruchu","category":"Linie prowadzące","description":"Linia kompozycyjna porządkuje gest, sylwetkę i otoczenie. Ważne, aby wzmacniała temat, a nie przecinała go przypadkowo."},{"src":"kompozycje-mini/line_fix_128.jpg","title":"Krzywa otwarta — schemat","category":"Linie prowadzące","description":"Zaplanuj przebieg linii zanim dodasz szczegóły. Sprawdź, jak zakręt i kierunek zmieniają ruch spojrzenia."},{"src":"kompozycje-mini/line_fix_129.jpg","title":"Portret i linia prowadząca","category":"Linie prowadzące","description":"Linia kompozycyjna porządkuje gest, sylwetkę i otoczenie. Ważne, aby wzmacniała temat, a nie przecinała go przypadkowo."},{"src":"kompozycje-mini/line_fix_130.jpg","title":"Linia spiralna — schemat","category":"Linie prowadzące","description":"Zaplanuj przebieg linii zanim dodasz szczegóły. Sprawdź, jak zakręt i kierunek zmieniają ruch spojrzenia."},{"src":"kompozycje-mini/line_fix_131.jpg","title":"Postać i ruch tkaniny","category":"Linie prowadzące","description":"Linia kompozycyjna porządkuje gest, sylwetkę i otoczenie. Ważne, aby wzmacniała temat, a nie przecinała go przypadkowo."},{"src":"kompozycje-mini/shape_fix_132.jpg","title":"Krzywa C — schemat i pejzaż","category":"Kształty i równowaga","description":"Krzywa C może otaczać główny motyw i kierować oko z powrotem do obrazu. Otwarta część łuku pozwala wyprowadzić wzrok dalej."},{"src":"kompozycje-mini/shape_fix_133.jpg","title":"Złoty podział — schemat i pejzaż","category":"Kształty i równowaga","description":"Dominanta jest przesunięta od środka, a podział formatu pomaga ocenić proporcje mas."},{"src":"kompozycje-mini/shape_fix_134.jpg","title":"Układ V — schemat i pejzaż","category":"Kształty i równowaga","description":"Dwie linie zbliżające się ku dołowi tworzą kierunek i prowadzą uwagę w głąb sceny."},{"src":"kompozycje-mini/shape_fix_135.jpg","title":"Nierównowaga i balans — schemat i pejzaż","category":"Kształty i równowaga","description":"Duża forma może być równoważona małym akcentem po przeciwnej stronie. Ważny jest ciężar wizualny, nie równe rozmiary."},{"src":"kompozycje-mini/shape_fix_136.jpg","title":"Równowaga mas — schemat i pejzaż","category":"Kształty i równowaga","description":"Dwie masy stabilizują układ. Zróżnicuj ich kształt, kontrast i odstępy, by kompozycja nie była mechaniczna."},{"src":"kompozycje-mini/shape_fix_137.jpg","title":"Podwójna przekątna — schemat i pejzaż","category":"Kształty i równowaga","description":"Dwie przekątne budują dynamikę; ich przecięcie powinno wspierać temat."},{"src":"kompozycje-mini/axes_fix_138.jpg","title":"Podział pionowy — symetria","category":"Kształty i równowaga","description":"Pion w środku daje symetrię i może usztywnić kadr. Przydatny, gdy zależy Ci na równowadze osiowej."},{"src":"kompozycje-mini/axes_fix_139.jpg","title":"Podział pionowy — przesunięcie osi","category":"Kształty i równowaga","description":"Przesunięcie pionu tworzy nierówne pola i więcej napięcia wizualnego."},{"src":"kompozycje-mini/axes_fix_140.jpg","title":"Horyzont centralny","category":"Kształty i równowaga","description":"Horyzont w połowie dzieli format na dwie równe strefy. Może być celowo statyczny."},{"src":"kompozycje-mini/axes_fix_141.jpg","title":"Horyzont przesunięty","category":"Kształty i równowaga","description":"Przesunięcie horyzontu zmienia wagę nieba i ziemi. Dobierz proporcję do tematu."},{"src":"kompozycje-mini/axes_fix_142.jpg","title":"Osie krzyżowe — środek","category":"Kształty i równowaga","description":"Dwie osie porządkują format, ale centralny motyw bywa zbyt oczywisty."},{"src":"kompozycje-mini/axes_fix_143.jpg","title":"Osie krzyżowe — asymetria","category":"Kształty i równowaga","description":"Przesunięta oś pozwala uzyskać ciekawszy balans i większą przestrzeń dla dominanty."},{"src":"kompozycje-mini/axes_fix_144.jpg","title":"Przekątna mocna","category":"Kształty i równowaga","description":"Mocna przekątna tworzy wyraźny podział i kierunek."},{"src":"kompozycje-mini/axes_fix_145.jpg","title":"Przekątna zmieniona","category":"Kształty i równowaga","description":"Zmiana położenia przekątnej zmienia ciężar pól i dynamikę kompozycji."},{"src":"kompozycje-mini/fig_fix_146.jpg","title":"Trójpodział — dwie postacie","category":"Kompozycje postaci","description":"Różne wysokości głów i ich położenie wzdłuż siatki ożywiają grupowy portret."},{"src":"kompozycje-mini/fig_fix_147.jpg","title":"Przekątna — scena z góry","category":"Kompozycje postaci","description":"Ukośna oś sceny dodaje ruchu. Gesty postaci prowadzą wzrok przez obraz."},{"src":"kompozycje-mini/fig_fix_148.jpg","title":"Trójkąt relacji postaci","category":"Kompozycje postaci","description":"Kierunki spojrzeń i gestów tworzą niewidoczny trójkąt, który łączy postacie."},{"src":"kompozycje-mini/fig_fix_149.jpg","title":"Trójkąt grupy postaci","category":"Kompozycje postaci","description":"Trzy postacie na wierzchołkach wyobrażonego trójkąta tworzą czytelny układ."},{"src":"kompozycje-mini/fig_fix_150.jpg","title":"Kierunki spojrzeń i gestów","category":"Kompozycje postaci","description":"Architektura i kierunki światła mogą kierować uwagę do najważniejszej postaci."},{"src":"kompozycje-mini/fig_fix_151.jpg","title":"Złota spirala — portret i figura","category":"Kompozycje postaci","description":"Krzywa prowadząca łączy sylwetki i punkt zainteresowania. Nie narzucaj spirali, jeśli nie wynika z form."},{"src":"kompozycje-mini/depth_fix_152.jpg","title":"Nieostry pierwszy plan","category":"Głębia i kadrowanie","description":"Miękki lub rozmyty pierwszy plan pozwala wyostrzyć motyw znajdujący się dalej w kadrze."},{"src":"kompozycje-mini/depth_fix_153.jpg","title":"Różnica skali i perspektywa","category":"Głębia i kadrowanie","description":"Porównanie wielkości pomaga zbudować odległość i skalę. Bliższe obiekty są zwykle większe."},{"src":"kompozycje-mini/depth_fix_154.jpg","title":"Głębia przez kolejne plany","category":"Głębia i kadrowanie","description":"Nakładanie planów i zmiana kontrastu budują przestrzeń bez nadmiaru detali."},{"src":"kompozycje-mini/depth_fix_155.jpg","title":"Naturalna rama","category":"Głębia i kadrowanie","description":"Gałęzie, architektura lub cień tworzą ramę. Nie pozwól, by rama konkurowała z tematem."},{"src":"kompozycje-mini/depth_fix_156.jpg","title":"Otwarta przestrzeń","category":"Głębia i kadrowanie","description":"Duże puste pole podkreśla skalę małej sylwetki. Negatywna przestrzeń staje się ważnym elementem obrazu."},{"src":"kompozycje-mini/depth_fix_157.jpg","title":"Odbicie i rytm","category":"Głębia i kadrowanie","description":"Odbicia i powtarzające się formy budują rytm. Uprość je do kilku czytelnych grup."},{"src":"kompozycje-mini/principles_fix_158.jpg","title":"Trójpodział — schemat i pejzaż","category":"Klasyczne zasady","description":"Horyzont i drobne elementy w pobliżu siatki trójpodziału utrzymują czytelny podział planów."},{"src":"kompozycje-mini/principles_fix_159.jpg","title":"Złota spirala — schemat i pejzaż","category":"Klasyczne zasady","description":"Spirala może poprowadzić wzrok od szerokiego planu do niewielkiej dominanty, np. drzewa."},{"src":"kompozycje-mini/principles_fix_160.jpg","title":"Przekątna — schemat i pejzaż","category":"Klasyczne zasady","description":"Przekątna wyznacza kierunek ruchu; linia stoku może poprowadzić wzrok w głąb."},{"src":"kompozycje-mini/principles_fix_161.jpg","title":"Piramida — schemat i pejzaż","category":"Klasyczne zasady","description":"Szeroka podstawa i wierzchołek stabilizują grupę form w pejzażu."},{"src":"kompozycje-mini/principles_fix_162.jpg","title":"Krzywa S — schemat i pejzaż","category":"Klasyczne zasady","description":"Krzywa S prowadzi spojrzenie łagodnie przez drogę, brzeg lub grupę drzew."},{"src":"kompozycje-mini/principles_fix_163.jpg","title":"Układ L — schemat i pejzaż","category":"Klasyczne zasady","description":"Pion drzewa i poziom ziemi tworzą układ L, pozostawiając otwartą przestrzeń."},{"src":"kompozycje-mini/space_fix_164.jpg","title":"Przestrzeń pozytywna — sylwetka","category":"Przestrzeń pozytywna i negatywna","description":"Forma pozytywna to główny motyw. Obserwuj jego sylwetkę, skalę i położenie w kadrze."},{"src":"kompozycje-mini/space_fix_165.jpg","title":"Przestrzeń negatywna — sylwetka","category":"Przestrzeń pozytywna i negatywna","description":"Przestrzeń negatywna to pole wokół obiektu. Jej kształt jest równie ważny jak sam motyw."},{"src":"kompozycje-mini/space_fix_166.jpg","title":"Przestrzeń pozytywna — martwa natura","category":"Przestrzeń pozytywna i negatywna","description":"Przedmioty tworzą formy pozytywne. Uprość ich grupę do kilku czytelnych kształtów."},{"src":"kompozycje-mini/space_fix_167.jpg","title":"Przestrzeń negatywna — martwa natura","category":"Przestrzeń pozytywna i negatywna","description":"Zwróć uwagę na przestrzenie między przedmiotami i wokół nich — one też tworzą rytm."},{"src":"kompozycje-mini/space_fix_168.jpg","title":"Forma pozytywna — kontrast","category":"Przestrzeń pozytywna i negatywna","description":"Mocny kontrast pozwala uprościć temat do dużych pól światła i cienia."},{"src":"kompozycje-mini/space_fix_169.jpg","title":"Forma negatywna — kontrast","category":"Przestrzeń pozytywna i negatywna","description":"Odwróć uwagę od obiektu i obserwuj kształt otaczającego go tła."},{"src":"kompozycje-mini/three_fix_170.jpg","title":"Dwa elementy — prosty układ","category":"Rytm i liczba elementów","description":"Dwie formy tworzą napięcie i porównanie. Ich wielkość i odległość powinny mieć wyraźny cel."},{"src":"kompozycje-mini/three_fix_171.jpg","title":"Trzy elementy — mocniejszy rytm","category":"Rytm i liczba elementów","description":"Trzy elementy pozwalają wyznaczyć dominantę, tonik i mały akcent."},{"src":"kompozycje-mini/three_fix_172.jpg","title":"Dwie masy w pejzażu","category":"Rytm i liczba elementów","description":"Dwie duże masy mogą zdominować całą przestrzeń. Zadbaj o miejsce na oddech."},{"src":"kompozycje-mini/three_fix_173.jpg","title":"Trzy masy w pejzażu","category":"Rytm i liczba elementów","description":"Trzy grupy tworzą bardziej złożony rytm. Zmieniaj skalę i odstępy, by nie tworzyć mechanicznego szeregu."},{"src":"kompozycje-mini/three_fix_174.jpg","title":"Dwa piony w lesie","category":"Rytm i liczba elementów","description":"Dwa piony dają prosty rytm, który można ożywić kontrastem skali."},{"src":"kompozycje-mini/three_fix_175.jpg","title":"Rytm trzech i więcej elementów","category":"Rytm i liczba elementów","description":"Więcej pionów daje bogatszy rytm. Zmieniaj odległości, wysokości i nakładanie form."},{"src":"kompozycje-mini/geom_final_176.jpg","title":"Studium podziału geometrycznego 01","category":"Geometria i podziały","description":"Uprość temat do kilku dużych płaszczyzn. Ten szkic służy do sprawdzenia rozmieszczenia form przed dodaniem szczegółów."},{"src":"kompozycje-mini/geom_final_177.jpg","title":"Studium podziału geometrycznego 02","category":"Geometria i podziały","description":"Zwróć uwagę na puste pola między liniami — negatywna przestrzeń współtworzy kompozycję."},{"src":"kompozycje-mini/geom_final_178.jpg","title":"Studium podziału geometrycznego 03","category":"Geometria i podziały","description":"Jedna przekątna lub oś może prowadzić wzrok. Pozostałe kierunki powinny ją wspierać."},{"src":"kompozycje-mini/geom_final_179.jpg","title":"Studium podziału geometrycznego 04","category":"Geometria i podziały","description":"Przecięcia linii tworzą punkty napięcia. Sprawdź, czy nie konkurują z dominantą."},{"src":"kompozycje-mini/geom_final_180.jpg","title":"Studium podziału geometrycznego 05","category":"Geometria i podziały","description":"Uprość temat do kilku dużych płaszczyzn. Ten szkic służy do sprawdzenia rozmieszczenia form przed dodaniem szczegółów."},{"src":"kompozycje-mini/geom_final_181.jpg","title":"Studium podziału geometrycznego 06","category":"Geometria i podziały","description":"Zwróć uwagę na puste pola między liniami — negatywna przestrzeń współtworzy kompozycję."},{"src":"kompozycje-mini/geom_final_182.jpg","title":"Studium podziału geometrycznego 07","category":"Geometria i podziały","description":"Jedna przekątna lub oś może prowadzić wzrok. Pozostałe kierunki powinny ją wspierać."},{"src":"kompozycje-mini/geom_final_183.jpg","title":"Studium podziału geometrycznego 08","category":"Geometria i podziały","description":"Przecięcia linii tworzą punkty napięcia. Sprawdź, czy nie konkurują z dominantą."},{"src":"kompozycje-mini/geom_final_184.jpg","title":"Studium podziału geometrycznego 09","category":"Geometria i podziały","description":"Zwróć uwagę na puste pola między liniami — negatywna przestrzeń współtworzy kompozycję."},{"src":"kompozycje-mini/geom_final_185.jpg","title":"Studium podziału geometrycznego 10","category":"Geometria i podziały","description":"Jedna przekątna lub oś może prowadzić wzrok. Pozostałe kierunki powinny ją wspierać."},{"src":"kompozycje-mini/geom_final_186.jpg","title":"Studium podziału geometrycznego 11","category":"Geometria i podziały","description":"Przecięcia linii tworzą punkty napięcia. Sprawdź, czy nie konkurują z dominantą."},{"src":"kompozycje-mini/geom_final_187.jpg","title":"Studium podziału geometrycznego 12","category":"Geometria i podziały","description":"Uprość temat do kilku dużych płaszczyzn. Ten szkic służy do sprawdzenia rozmieszczenia form przed dodaniem szczegółów."},{"src":"kompozycje-mini/geom_final_188.jpg","title":"Studium podziału geometrycznego 13","category":"Geometria i podziały","description":"Zwróć uwagę na puste pola między liniami — negatywna przestrzeń współtworzy kompozycję."},{"src":"kompozycje-mini/geom_final_189.jpg","title":"Studium podziału geometrycznego 14","category":"Geometria i podziały","description":"Jedna przekątna lub oś może prowadzić wzrok. Pozostałe kierunki powinny ją wspierać."},{"src":"kompozycje-mini/geom_final_190.jpg","title":"Studium podziału geometrycznego 15","category":"Geometria i podziały","description":"Przecięcia linii tworzą punkty napięcia. Sprawdź, czy nie konkurują z dominantą."},{"src":"kompozycje-mini/geom_final_191.jpg","title":"Studium podziału geometrycznego 16","category":"Geometria i podziały","description":"Uprość temat do kilku dużych płaszczyzn. Ten szkic służy do sprawdzenia rozmieszczenia form przed dodaniem szczegółów."},{"src":"kompozycje-mini/geom_final_192.jpg","title":"Studium podziału geometrycznego 17","category":"Geometria i podziały","description":"Jedna przekątna lub oś może prowadzić wzrok. Pozostałe kierunki powinny ją wspierać."},{"src":"kompozycje-mini/geom_final_193.jpg","title":"Studium podziału geometrycznego 18","category":"Geometria i podziały","description":"Przecięcia linii tworzą punkty napięcia. Sprawdź, czy nie konkurują z dominantą."},{"src":"kompozycje-mini/geom_final_194.jpg","title":"Studium podziału geometrycznego 19","category":"Geometria i podziały","description":"Uprość temat do kilku dużych płaszczyzn. Ten szkic służy do sprawdzenia rozmieszczenia form przed dodaniem szczegółów."},{"src":"kompozycje-mini/geom_final_195.jpg","title":"Studium podziału geometrycznego 20","category":"Geometria i podziały","description":"Zwróć uwagę na puste pola między liniami — negatywna przestrzeń współtworzy kompozycję."},{"src":"kompozycje-mini/geom_final_196.jpg","title":"Studium podziału geometrycznego 21","category":"Geometria i podziały","description":"Jedna przekątna lub oś może prowadzić wzrok. Pozostałe kierunki powinny ją wspierać."},{"src":"kompozycje-mini/geom_final_197.jpg","title":"Studium podziału geometrycznego 22","category":"Geometria i podziały","description":"Przecięcia linii tworzą punkty napięcia. Sprawdź, czy nie konkurują z dominantą."},{"src":"kompozycje-mini/geom_final_198.jpg","title":"Studium podziału geometrycznego 23","category":"Geometria i podziały","description":"Uprość temat do kilku dużych płaszczyzn. Ten szkic służy do sprawdzenia rozmieszczenia form przed dodaniem szczegółów."},{"src":"kompozycje-mini/geom_final_199.jpg","title":"Studium podziału geometrycznego 24","category":"Geometria i podziały","description":"Zwróć uwagę na puste pola między liniami — negatywna przestrzeń współtworzy kompozycję."},{"src":"kompozycje-mini/geom_final_200.jpg","title":"Studium podziału geometrycznego 25","category":"Geometria i podziały","description":"Przecięcia linii tworzą punkty napięcia. Sprawdź, czy nie konkurują z dominantą."},{"src":"kompozycje-mini/geom_final_201.jpg","title":"Studium podziału geometrycznego 26","category":"Geometria i podziały","description":"Uprość temat do kilku dużych płaszczyzn. Ten szkic służy do sprawdzenia rozmieszczenia form przed dodaniem szczegółów."},{"src":"kompozycje-mini/geom_final_202.jpg","title":"Studium podziału geometrycznego 27","category":"Geometria i podziały","description":"Zwróć uwagę na puste pola między liniami — negatywna przestrzeń współtworzy kompozycję."},{"src":"kompozycje-mini/geom_final_203.jpg","title":"Studium podziału geometrycznego 28","category":"Geometria i podziały","description":"Jedna przekątna lub oś może prowadzić wzrok. Pozostałe kierunki powinny ją wspierać."},{"src":"kompozycje-mini/geom_final_204.jpg","title":"Studium podziału geometrycznego 29","category":"Geometria i podziały","description":"Przecięcia linii tworzą punkty napięcia. Sprawdź, czy nie konkurują z dominantą."},{"src":"kompozycje-mini/geom_final_205.jpg","title":"Studium podziału geometrycznego 30","category":"Geometria i podziały","description":"Uprość temat do kilku dużych płaszczyzn. Ten szkic służy do sprawdzenia rozmieszczenia form przed dodaniem szczegółów."},{"src":"kompozycje-mini/geom_final_206.jpg","title":"Studium podziału geometrycznego 31","category":"Geometria i podziały","description":"Zwróć uwagę na puste pola między liniami — negatywna przestrzeń współtworzy kompozycję."},{"src":"kompozycje-mini/geom_final_207.jpg","title":"Studium podziału geometrycznego 32","category":"Geometria i podziały","description":"Jedna przekątna lub oś może prowadzić wzrok. Pozostałe kierunki powinny ją wspierać."},{"src":"kompozycje-mini/geom_final_208.jpg","title":"Studium podziału geometrycznego 33","category":"Geometria i podziały","description":"Uprość temat do kilku dużych płaszczyzn. Ten szkic służy do sprawdzenia rozmieszczenia form przed dodaniem szczegółów."},{"src":"kompozycje-mini/geom_final_209.jpg","title":"Studium podziału geometrycznego 34","category":"Geometria i podziały","description":"Zwróć uwagę na puste pola między liniami — negatywna przestrzeń współtworzy kompozycję."},{"src":"kompozycje-mini/geom_final_210.jpg","title":"Studium podziału geometrycznego 35","category":"Geometria i podziały","description":"Jedna przekątna lub oś może prowadzić wzrok. Pozostałe kierunki powinny ją wspierać."},{"src":"kompozycje-mini/geom_final_211.jpg","title":"Studium podziału geometrycznego 36","category":"Geometria i podziały","description":"Przecięcia linii tworzą punkty napięcia. Sprawdź, czy nie konkurują z dominantą."},{"src":"kompozycje-mini/geom_final_212.jpg","title":"Studium podziału geometrycznego 37","category":"Geometria i podziały","description":"Uprość temat do kilku dużych płaszczyzn. Ten szkic służy do sprawdzenia rozmieszczenia form przed dodaniem szczegółów."},{"src":"kompozycje-mini/geom_final_213.jpg","title":"Studium podziału geometrycznego 38","category":"Geometria i podziały","description":"Zwróć uwagę na puste pola między liniami — negatywna przestrzeń współtworzy kompozycję."},{"src":"kompozycje-mini/geom_final_214.jpg","title":"Studium podziału geometrycznego 39","category":"Geometria i podziały","description":"Jedna przekątna lub oś może prowadzić wzrok. Pozostałe kierunki powinny ją wspierać."},{"src":"kompozycje-mini/geom_final_215.jpg","title":"Studium podziału geometrycznego 40","category":"Geometria i podziały","description":"Przecięcia linii tworzą punkty napięcia. Sprawdź, czy nie konkurują z dominantą."},{"src":"kompozycje-mini/geom_final_216.jpg","title":"Studium podziału geometrycznego 41","category":"Geometria i podziały","description":"Zwróć uwagę na puste pola między liniami — negatywna przestrzeń współtworzy kompozycję."},{"src":"kompozycje-mini/geom_final_217.jpg","title":"Studium podziału geometrycznego 42","category":"Geometria i podziały","description":"Jedna przekątna lub oś może prowadzić wzrok. Pozostałe kierunki powinny ją wspierać."},{"src":"kompozycje-mini/geom_final_218.jpg","title":"Studium podziału geometrycznego 43","category":"Geometria i podziały","description":"Przecięcia linii tworzą punkty napięcia. Sprawdź, czy nie konkurują z dominantą."},{"src":"kompozycje-mini/geom_final_219.jpg","title":"Studium podziału geometrycznego 44","category":"Geometria i podziały","description":"Uprość temat do kilku dużych płaszczyzn. Ten szkic służy do sprawdzenia rozmieszczenia form przed dodaniem szczegółów."},{"src":"kompozycje-mini/geom_final_220.jpg","title":"Studium podziału geometrycznego 45","category":"Geometria i podziały","description":"Zwróć uwagę na puste pola między liniami — negatywna przestrzeń współtworzy kompozycję."},{"src":"kompozycje-mini/geom_final_221.jpg","title":"Studium podziału geometrycznego 46","category":"Geometria i podziały","description":"Jedna przekątna lub oś może prowadzić wzrok. Pozostałe kierunki powinny ją wspierać."},{"src":"kompozycje-mini/geom_final_222.jpg","title":"Studium podziału geometrycznego 47","category":"Geometria i podziały","description":"Przecięcia linii tworzą punkty napięcia. Sprawdź, czy nie konkurują z dominantą."},{"src":"kompozycje-mini/geom_final_223.jpg","title":"Studium podziału geometrycznego 48","category":"Geometria i podziały","description":"Uprość temat do kilku dużych płaszczyzn. Ten szkic służy do sprawdzenia rozmieszczenia form przed dodaniem szczegółów."}];
+ const root=document.getElementById('referenceCompositionGallery');
+ const search=document.getElementById('referenceCompositionSearch');
+ const category=document.getElementById('referenceCompositionCategory');
+ const count=document.getElementById('referenceCompositionCount');
+ const esc=s=>String(s).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+ function renderReferences(){
+  if(!root)return;
+  const q=(search?.value||'').trim().toLocaleLowerCase('pl');
+  const cat=category?.value||'all';
+  const found=entries.filter(item=>(cat==='all'||item.category===cat)&&(!q||(item.title+' '+item.description+' '+item.category).toLocaleLowerCase('pl').includes(q)));
+  count.textContent=`Wyświetlono ${found.length} z ${entries.length} pojedynczych przykładów`;
+  root.innerHTML=found.map(item=>`<article class="reference-composition-card">
+   <img src="./${esc(item.src)}" alt="${esc(item.title)} — szkic kompozycyjny" loading="lazy" decoding="async">
+   <div class="reference-copy"><h3>${esc(item.title)}</h3><p>${esc(item.description)}</p><span class="reference-tag">${esc(item.category)}</span></div>
+  </article>`).join('');
+ }
+ search?.addEventListener('input',renderReferences);
+ category?.addEventListener('change',renderReferences);
+ renderReferences();
+})();
+</script>
+
+<script>
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(err => console.warn('Nie udało się uruchomić trybu offline:', err));
+  });
+}
+</script>
+
+</body></html>

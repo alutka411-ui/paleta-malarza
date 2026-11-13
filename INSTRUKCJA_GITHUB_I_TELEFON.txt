@@ -1,0 +1,25 @@
+PALETA MALARZA — PUBLIKACJA NA GITHUB PAGES I INSTALACJA NA TELEFONIE
+
+1. Rozpakuj archiwum ZIP na komputerze.
+2. Otwórz folder z rozpakowaną zawartością.
+3. Zaznacz CAŁĄ zawartość folderu (nie sam folder nadrzędny).
+4. W repozytorium GitHub alutka411-ui/paleta-malarska otwórz główny katalog na gałęzi main.
+5. Wybierz Add file → Upload files i przeciągnij wszystkie pliki oraz foldery.
+6. Upewnij się, że na najwyższym poziomie repozytorium znajdują się m.in. index.html, manifest.webmanifest, sw.js, ikony, .nojekyll oraz folder kompozycje-mini.
+7. Zatwierdź zmiany przyciskiem Commit changes.
+8. Sprawdź Settings → Pages: Deploy from a branch, gałąź main, katalog /(root).
+9. Po zakończeniu publikacji otwórz adres GitHub Pages.
+
+WAŻNE:
+- Folder kompozycje-mini musi zostać wgrany w całości; zawiera 223 pojedyncze ilustracje.
+- Nie przenoś plików do dodatkowego podfolderu — index.html ma być w katalogu głównym publikacji.
+- Nie usuwaj manifest.webmanifest ani sw.js.
+- Po aktualizacji zamknij poprzednią kartę aplikacji i otwórz ponownie adres GitHub Pages.
+- Jeśli telefon pokazuje starą wersję, wyczyść dane witryny dla strony GitHub Pages lub usuń i zainstaluj PWA ponownie.
+
+INSTALACJA:
+Android: Chrome → menu ⋮ → Zainstaluj aplikację / Dodaj do ekranu głównego.
+iPhone/iPad: Safari → Udostępnij → Dodaj do ekranu początkowego.
+Instalacja wymaga opublikowanej strony HTTPS. Lokalny plik index.html otwarty z dysku nie zapewnia pełnej obsługi PWA.
+
+To PWA — nie jest to plik APK.
